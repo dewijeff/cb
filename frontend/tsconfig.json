@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "jsx": "react",
+    "module": "ESNext",
+    "target": "es5",
+    "allowJs": true
+  }
+}
