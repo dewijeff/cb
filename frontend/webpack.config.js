@@ -58,6 +58,7 @@ const config = {
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js', '...'],
     },
+    devtool: "cheap-module-source-map",
 };
 
 module.exports = () => {

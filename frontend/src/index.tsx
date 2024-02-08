@@ -1,11 +1,16 @@
 import React from "react";
-import { render } from "react-dom";
+import { createRoot } from 'react-dom/client';
+import Home from "./home";
+import { HashRouter, Route, Routes} from "react-router-dom";
 
-import "core-js/stable";
-import "regenerator-runtime/runtime";
+const App = () => (
+  <HashRouter>
+    <Routes>
+      <Route path="/" element={<Home />} />
+    </Routes>
+  </HashRouter>
+);
 
-const App = () => {
-  return <div>Hello, worldz!</div>;
-};
-
-render(<App />, document.getElementById("app"));
+const domNode = document.getElementById('app');
+const root = createRoot(domNode);
+root.render(<App />);

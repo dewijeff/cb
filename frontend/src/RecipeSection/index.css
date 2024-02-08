@@ -1,0 +1,35 @@
+.ingredients-container {
+    display: grid;
+    grid-template-columns: 2% 3% 20% 5% 65%;
+    grid-auto-rows: minmax(40,auto);
+    column-gap: 5px;
+}
+
+.ingredient-group {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / 6;
+}
+
+.ingredient-group-name {
+    grid-column: 2 / 6;
+}
+
+.ingredient-item {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 3/6;
+}
+
+.ingredient-description {
+    grid-column: 1;
+}
+
+.ingredient-amount {
+    grid-column: 2;
+    text-align: right;
+}
+
+.ingredient-unit {
+    grid-column: 3
+}

@@ -6,6 +6,8 @@
     "jsx": "react",
     "module": "ESNext",
     "target": "es5",
-    "allowJs": true
+    "allowJs": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   }
 }
