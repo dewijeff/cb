@@ -1,13 +1,15 @@
 ﻿using System.Text.Json;
 using api.Areas.Content.Models;
+using api.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Areas.Content
 {
     [ApiController]
     [Route("cookbook")]
-    public class ContentController : ControllerBase
+    public class ContentController : Controller
     {
+        private readonly JsonSerializerOptions _jsonSettings = CommonSerializerOptions.SerializerOptions;
         [HttpGet]
         [Route("recipe")] 
         public async Task<IActionResult> GetRecipe([FromQuery] string id, CancellationToken cancellationToken)
@@ -21,12 +23,12 @@ namespace api.Areas.Content
 
         [HttpGet]
         [Route("contents")]
-        public async Task<IActionResult> GetRecipes(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetContents(CancellationToken cancellationToken)
         {
             // TODO: Get the table of contents
             var allRecipes = new List<ListingCategory>();
 
-            return new JsonResult(JsonSerializer.Serialize(allRecipes));
+            return Json(allRecipes, _jsonSettings);
         }
 
     }
