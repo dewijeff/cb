@@ -1,28 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
 import { Layout, Menu } from 'antd'
-import recipeData from '../recipes.json'
-import { Recipe, Category } from '../module';
+import { ListingRecipe, ListingCategory, Recipe } from '../module';
 import RecipeSection from '../RecipeSection';
 const { Header, Content, Sider } = Layout;
 
-const groups = (recipeData as unknown) as Category[];
-console.log(groups);
+const baseAddress = "https://localhost:7014/"
 
 const Home = () => {
-    const [selectedRecpie, setSelectedRecipe] = useState<Recipe | null>(null);
+    const [selectedListingRecpie, setSelectedListingRecipe] = useState<ListingRecipe | null>(null);
+    const [recipe, setRecipe] = useState<Recipe | undefined>(null);
+    const [categories, setCategories] = useState<ListingCategory[]>(null);
     const cookbookName = "jeff's";
 
-    const siderItems: MenuProps['items'] = groups.map(group => ({
-        key: group.id,
+    const getCategoryData = useCallback(async () => {
+        const response = await fetch(`${baseAddress}cookbook/contents/`);
+
+        if (!response.ok)
+            return null;
+
+        const categories:ListingCategory[] = await response.json();
+        return categories;
+    }, []);
+
+    useEffect(() => {
+        getCategoryData().then(setCategories)
+    }, []);
+
+    const getRecipe = useCallback(async () => {
+        const url = `${baseAddress}cookbook/recipe?id=${selectedListingRecpie.recipeId}`
+        const response = await fetch(url);
+
+        if (!response.ok)
+            return null;
+
+        const recipe:Recipe = await response.json();
+        return recipe;
+    },[selectedListingRecpie]);
+
+    useEffect(() => {
+        if (!selectedListingRecpie?.recipeId)
+            return;
+
+        getRecipe().then(setRecipe);
+    }, [selectedListingRecpie]);
+
+    const siderItems: MenuProps['items'] = categories?.map(group => ({
+        key: group.order,
         label: group.name,
         children: group.recipes.map(recipe => {
             return {
                 key: recipe.name,
                 label: recipe.name,
-                onClick: () => setSelectedRecipe(recipe)
+                onClick: () => setSelectedListingRecipe(recipe)
             }
         })
     }));
@@ -50,11 +82,11 @@ const Home = () => {
                     </Sider>
                     <Content>
                         <div>
-                            {!!selectedRecpie
+                            {!!recipe
                                 ?
-                                    (<RecipeSection recipe={selectedRecpie}/>)
+                                    (<RecipeSection recipe={recipe}/>)
                                 :
-                                    <h2>{selectedRecpie?.name ?? "Select A Recipe"}</h2>
+                                    <h2>{recipe?.name ?? "Select A Recipe"}</h2>
                             }
                         </div>
                     </Content>

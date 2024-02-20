@@ -1,35 +1,43 @@
-﻿using System.Text.Json;
-using api.Areas.Content.Models;
+﻿using api.Areas.Content.Services.Contracts;
+using api.Areas.Content.Services.Repositories.Contracts;
 using api.Shared;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
-namespace api.Areas.Content
+namespace api.Areas.Content;
+
+[ApiController]
+[Route("cookbook")]
+public class ContentController : Controller
 {
-    [ApiController]
-    [Route("cookbook")]
-    public class ContentController : Controller
+    private readonly JsonSerializerOptions _jsonSettings = CommonSerializerOptions.SerializerOptions;
+
+    private readonly IReadOnlyCategoryRepository _categoryRepository;
+    private readonly IRecipeDomainService _recipeDomainService;
+
+    public ContentController(
+        IReadOnlyCategoryRepository categoryRepository,
+        IRecipeDomainService recpieDomainService)
     {
-        private readonly JsonSerializerOptions _jsonSettings = CommonSerializerOptions.SerializerOptions;
-        [HttpGet]
-        [Route("recipe")] 
-        public async Task<IActionResult> GetRecipe([FromQuery] string id, CancellationToken cancellationToken)
-        {
-            // TODO: Get the data from the 
+        _categoryRepository = categoryRepository;
+        _recipeDomainService = recpieDomainService;
+    }
 
-            var recipeResult = new Recipe();
+    [HttpGet]
+    [Route("contents")]
+    public async Task<IActionResult> GetContents(CancellationToken cancellationToken)
+    {
+        var allRecipes = await _categoryRepository.GetCategories(cancellationToken);
 
-            return new JsonResult(JsonSerializer.Serialize(recipeResult));
-        }
+        return Json(allRecipes, _jsonSettings);
+    }
 
-        [HttpGet]
-        [Route("contents")]
-        public async Task<IActionResult> GetContents(CancellationToken cancellationToken)
-        {
-            // TODO: Get the table of contents
-            var allRecipes = new List<ListingCategory>();
+    [HttpGet]
+    [Route("recipe")]
+    public async Task<IActionResult> GetRecipe([FromQuery] string id, CancellationToken cancellationToken)
+    {
+        var recipe = await _recipeDomainService.GetRecipe(id, cancellationToken);
 
-            return Json(allRecipes, _jsonSettings);
-        }
-
+        return Json(recipe, _jsonSettings);
     }
 }

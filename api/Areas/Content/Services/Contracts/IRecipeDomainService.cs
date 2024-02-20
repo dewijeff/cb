@@ -1,8 +1,8 @@
 ﻿using api.Areas.Content.Models;
 
-namespace api.Areas.Content.Services.Repositories.Contracts;
+namespace api.Areas.Content.Services.Contracts;
 
-public interface IReadOnlyRecipeRepository
+public interface IRecipeDomainService
 {
     public Task<Recipe?> GetRecipe(string id, CancellationToken cancellationToken);
 }

@@ -1,13 +1,14 @@
-﻿namespace api.Areas.Content.Models
+﻿namespace api.Areas.Content.Models;
+
+public class ListingRecipe
 {
-    public class ListingRecipe
-    {
-        public string Name { get; set; } = string.Empty;
+    public int Order { get; set; }
 
-        public string RecipeId { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
-        public string? ImageUrl { get; set; }
+    public string RecipeId { get; set; } = string.Empty;
 
-        public string? Notes { get; set; }
-    }
+    public string? ImageUrl { get; set; }
+
+    public string? Notes { get; set; }
 }

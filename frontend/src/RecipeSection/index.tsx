@@ -15,7 +15,7 @@ const RecipeSection = ({recipe}: Props) => {
             <h2>{recipe.name}</h2>
             <h3> Ingredients</h3>
             <div className="ingredients-container">
-                {recipe.ingredientGroups?.map(x => IngredientGroupSection(x))}
+                {recipe.ingredientGroups?.sort((a, b) => a.order - b.order).map(x => IngredientGroupSection(x))}
             </div>
             {recipe.stepGroups?.sort((a, b) => a.order - b.order).map(x => InstructionGroupSection(x))}
         </div>

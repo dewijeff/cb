@@ -1,9 +1,8 @@
 ﻿using api.Areas.Content.Models;
 
-namespace api.Areas.Content.Services.Repositories.Contracts
+namespace api.Areas.Content.Services.Repositories.Contracts;
+
+public interface IReadOnlyCategoryRepository
 {
-    public interface IReadOnlyCategoryRepository
-    {
-        IEnumerable<ListingCategory> GetCategories();
-    }
+    Task<IEnumerable<ListingCategory>> GetCategories(CancellationToken cancellationToken);
 }
