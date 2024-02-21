@@ -1,5 +1,7 @@
 ﻿using api.Areas.Content.Models;
 using api.Areas.Content.Services.Repositories.Contracts;
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace api.Areas.Content.Services.Repositories;
 
@@ -90,6 +92,13 @@ public class ReadOnlyIngredientRepository : IReadOnlyIngredientRepository
 
     public async Task<IEnumerable<Ingredient>?> GetIngredients(IEnumerable<string> ingredientIds, CancellationToken cancellationToken)
     {
+        var connectionString = Environment.GetEnvironmentVariable("MONGO_COOKBOOK_URI");
+        if (connectionString == null)
+            throw new Exception("Invalid Mongo Connection String");
+
+        var client = new MongoClient(connectionString);
+        var collection = client.GetDatabase("cb").GetCollection<BsonDocument>("test");
+
         return ingredientIds.Where(_ingredients.ContainsKey)
             .Select(x => _ingredients[x])
             .ToList();
