@@ -11,6 +11,7 @@ const baseAddress = "https://localhost:7014/"
 
 const Home = () => {
     const [selectedListingRecpie, setSelectedListingRecipe] = useState<ListingRecipe | null>(null);
+    const [recipeLoading, setRecipeLoading] = useState(false);
     const [recipe, setRecipe] = useState<Recipe | undefined>(null);
     const [categories, setCategories] = useState<ListingCategory[]>(null);
     const cookbookName = "jeff's";
@@ -44,7 +45,11 @@ const Home = () => {
         if (!selectedListingRecpie?.recipeId)
             return;
 
-        getRecipe().then(setRecipe);
+        setRecipeLoading(true);
+        getRecipe().then((value) => {
+            setRecipe(value);
+            setRecipeLoading(false);
+        });
     }, [selectedListingRecpie]);
 
     const siderItems: MenuProps['items'] = categories?.map(group => ({
@@ -84,7 +89,7 @@ const Home = () => {
                         <div>
                             {!!recipe
                                 ?
-                                    (<RecipeSection recipe={recipe}/>)
+                                    (<RecipeSection recipe={recipe} loading={recipeLoading}/>)
                                 :
                                     <h2>{recipe?.name ?? "Select A Recipe"}</h2>
                             }

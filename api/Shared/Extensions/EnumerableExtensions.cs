@@ -6,9 +6,4 @@ public static class EnumerableExtensions
     {
         return list ?? Enumerable.Empty<T>();
     }
-
-    public static bool IsNullOrEmpty<TSource>(this IEnumerable<TSource> @this)
-    {
-        return @this == null || !@this.Any();
-    }
 }

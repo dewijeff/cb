@@ -1,11 +1,17 @@
 ﻿using api.Areas.Content.Models;
 using api.Areas.Content.Services.Repositories.Contracts;
 using api.Shared;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace api.Areas.Content.Services.Repositories;
 
 public class ReadOnlyRecipeRepository : IReadOnlyRecipeRepository
 {
+    private const string UriEnvVariable = "MONGO_COOKBOOK_URI";
+    private const string CookbookDatabase = "cb";           // TODO: @JXD - Set these from an appsetting...
+    private const string RecipeCollection = "recipes";      
+
     private IDictionary<string, Recipe> _recipes = new Dictionary<string, Recipe>
     {
         {
@@ -152,13 +158,6 @@ public class ReadOnlyRecipeRepository : IReadOnlyRecipeRepository
                                 IngredientId = "9",
                                 Amount = 1.5m,
                                 Unit = MeasurementUnit.Tablespoon
-                            },
-                            new RecipeIngredient
-                            {
-                                Order = 1,
-                                IngredientId = "2",
-                                Amount = 6,
-                                Unit = MeasurementUnit.Cup
                             }
                         }
                     },
@@ -197,13 +196,7 @@ public class ReadOnlyRecipeRepository : IReadOnlyRecipeRepository
                                 Order = 2,
                                 Title = "Combine by hand",
                                 Instructions = "Mix the butter into the dry ingredients by hand, pinching the buter into the dry ingredients until it is the size of grains of rice.  When done, the mix should hold together like slightly damp sand when you squeeze a fistful of it."
-                            },
-                            new Step
-                            {
-                                Order = 3,
-                                Title = "Put all ingredients into bowl",
-                                Instructions = ""
-                            },
+                            }
                         }
                     },
                     new StepGroup
@@ -222,7 +215,7 @@ public class ReadOnlyRecipeRepository : IReadOnlyRecipeRepository
                             {
                                 Order = 1,
                                 Title = "Add Milk",
-                                Instructions = "add milk a little at a time and stir with a spoon until the desired consistency.  This is usually when there are no dry spots left in the flour, but well before it is soupy.  More like a stiff, stretchy paste."
+                                Instructions = "Add milk a little at a time and stir with a spoon until the desired consistency.  This is usually when there are no dry spots left in the flour, but well before it is soupy.  More like a stiff, stretchy paste."
                             },
                             new Step
                             {
@@ -280,6 +273,17 @@ public class ReadOnlyRecipeRepository : IReadOnlyRecipeRepository
 
     public async Task<Recipe?> GetRecipe(string id, CancellationToken cancellationToken)
     {
-        return _recipes.TryGetValue(id, out var recipe) ? recipe : null;
+        var connectionString = Environment.GetEnvironmentVariable(UriEnvVariable); 
+        if (connectionString == null)
+            throw new Exception("Invalid Mongo Connection String");
+
+        var client = new MongoClient(connectionString);
+        var collection = client.GetDatabase(CookbookDatabase).GetCollection<Recipe>(RecipeCollection);
+
+        var filter = Builders<Recipe>.Filter.Eq("_id", ObjectId.Parse(id));
+
+        var recipe = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+
+        return recipe;
     }
 }

@@ -1,12 +1,17 @@
 ﻿using api.Areas.Content.Models;
 using api.Areas.Content.Services.Repositories.Contracts;
-using MongoDB.Driver;
+using api.Shared.Extensions;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace api.Areas.Content.Services.Repositories;
 
 public class ReadOnlyIngredientRepository : IReadOnlyIngredientRepository
 {
+    private const string UriEnvVariable = "MONGO_COOKBOOK_URI";
+    private const string CookbookDatabase = "cb";           // TODO: @JXD - Set these from an appsetting...
+    private const string IngredientsCollection = "ingredients";
+
     private readonly Dictionary<string, Ingredient> _ingredients = new ()
     {
         {
@@ -85,22 +90,30 @@ public class ReadOnlyIngredientRepository : IReadOnlyIngredientRepository
         },
     };
 
-    public async Task<Ingredient?> GetIngredient(string ingredientId, CancellationToken cancellationToken)
-    {
-        return _ingredients.TryGetValue(ingredientId, out var ingredient) ? ingredient : null;
-    }
-
     public async Task<IEnumerable<Ingredient>?> GetIngredients(IEnumerable<string> ingredientIds, CancellationToken cancellationToken)
     {
-        var connectionString = Environment.GetEnvironmentVariable("MONGO_COOKBOOK_URI");
+        var collection = GetIngredientCollection();
+
+        var objectIds = ingredientIds.EmptyIfNull().Select(ObjectId.Parse);
+
+        var filter = Builders<Ingredient>.Filter.In("_id", objectIds);
+
+        var ingredients = await collection.Find(filter).ToListAsync(cancellationToken);
+
+        // TODO: @JXD - cache these so we don't have to get them from the database again? if I do that - how do you trigger invalidation (hard problem #2)
+
+        return ingredients;
+    }
+
+    // TODO: Move this to a generic at the database layer that takes a type and a collectionName string and returns the collection for use across all repositories
+    private IMongoCollection<Ingredient> GetIngredientCollection()
+    {
+        var connectionString = Environment.GetEnvironmentVariable(UriEnvVariable);
         if (connectionString == null)
             throw new Exception("Invalid Mongo Connection String");
 
         var client = new MongoClient(connectionString);
-        var collection = client.GetDatabase("cb").GetCollection<BsonDocument>("test");
-
-        return ingredientIds.Where(_ingredients.ContainsKey)
-            .Select(x => _ingredients[x])
-            .ToList();
+        return client.GetDatabase(CookbookDatabase).GetCollection<Ingredient>(IngredientsCollection);
     }
+    // TODO: method to get ALL ingredients for editor...
 }
