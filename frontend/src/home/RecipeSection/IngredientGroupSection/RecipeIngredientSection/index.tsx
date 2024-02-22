@@ -1,6 +1,7 @@
 import React from "react";
-import { GetIngredientNameString, GetUnitsString, RecipeIngredient } from "../../../../module";
 import 'antd/dist/antd.css';
+import { RecipeIngredient } from "../../../../models";
+import { GetIngredientNameString, GetUnitsString } from "../../../../module";
 
 const RecipeIngredientSection = ({ingredient, amount, unit, order} :RecipeIngredient) => (
     <div className="ingredient-item" key={ingredient.name + order}>

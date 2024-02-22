@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
-import { Button, Layout, Menu } from 'antd'
-import { ListingRecipe, ListingCategory, Recipe } from '../module';
+import { Layout, Menu } from 'antd'
+import { ListingRecipe, ListingCategory, Recipe, CookbookName } from '../models';
 import RecipeSection from './RecipeSection';
-import { Link } from 'react-router-dom';
-const { Header, Content, Sider } = Layout;
+import CookbookHeader from '../CookbookHeader';
+const { Content, Sider } = Layout;
 
 const baseAddress = "https://localhost:7014/"
 
@@ -15,7 +15,6 @@ const Home = () => {
     const [recipeLoading, setRecipeLoading] = useState(false);
     const [recipe, setRecipe] = useState<Recipe | undefined>(null);
     const [categories, setCategories] = useState<ListingCategory[]>(null);
-    const cookbookName = "jeff's";
 
     const getCategoryData = useCallback(async () => {
         const response = await fetch(`${baseAddress}cookbook/contents/`);
@@ -65,22 +64,9 @@ const Home = () => {
         })
     }));
 
-    // const handleAddRecipe = () => {
-
-    // };
-
     return (
         <Layout>
-            <Header>
-                <div 
-                    style={{
-                        margin: "auto"
-                    }}
-                >
-                    <h1 className="cookbookTitle">{cookbookName} Cookbook <Link to="/AddRecipe">Add A Recipe</Link></h1>
-                    
-                </div>
-            </Header>
+            <CookbookHeader cookbookName={CookbookName}/>
             <Content>
                 <Layout>
                     <Sider>
@@ -103,9 +89,7 @@ const Home = () => {
                     </Content>
                 </Layout>
             </Content>
-
         </Layout>
-
     );
 }
 

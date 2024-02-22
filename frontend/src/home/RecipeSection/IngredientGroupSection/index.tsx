@@ -1,5 +1,5 @@
 import React from "react";
-import { IngredientGroup } from "../../../module";
+import { IngredientGroup } from "../../../models";
 import RecipeIngredient from "./RecipeIngredientSection";
 import 'antd/dist/antd.css';
 
