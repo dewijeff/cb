@@ -1,5 +1,5 @@
 import React from "react";
-import { GetIngredientNameString, GetUnitsString, RecipeIngredient } from "../../../module";
+import { GetIngredientNameString, GetUnitsString, RecipeIngredient } from "../../../../module";
 import 'antd/dist/antd.css';
 
 const RecipeIngredientSection = ({ingredient, amount, unit, order} :RecipeIngredient) => (

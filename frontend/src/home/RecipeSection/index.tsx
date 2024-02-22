@@ -1,5 +1,5 @@
 import React from "react";
-import { Recipe } from "../module";
+import { Recipe } from "../../module";
 import IngredientGroupSection from "./IngredientGroupSection";
 import InstructionGroupSection from "./InstructionGroupSection";
 import 'antd/dist/antd.css';

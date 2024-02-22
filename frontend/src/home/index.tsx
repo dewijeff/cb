@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
-import { Layout, Menu } from 'antd'
+import { Button, Layout, Menu } from 'antd'
 import { ListingRecipe, ListingCategory, Recipe } from '../module';
-import RecipeSection from '../RecipeSection';
+import RecipeSection from './RecipeSection';
+import { Link } from 'react-router-dom';
 const { Header, Content, Sider } = Layout;
 
 const baseAddress = "https://localhost:7014/"
@@ -64,6 +65,10 @@ const Home = () => {
         })
     }));
 
+    // const handleAddRecipe = () => {
+
+    // };
+
     return (
         <Layout>
             <Header>
@@ -72,7 +77,8 @@ const Home = () => {
                         margin: "auto"
                     }}
                 >
-                    <h1 className="cookbookTitle">{cookbookName} Cookbook</h1>
+                    <h1 className="cookbookTitle">{cookbookName} Cookbook <Link to="/AddRecipe">Add A Recipe</Link></h1>
+                    
                 </div>
             </Header>
             <Content>

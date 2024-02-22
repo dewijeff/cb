@@ -1,15 +1,16 @@
 import React from "react";
 import { createRoot } from 'react-dom/client';
-import Home from "./home";
-import { HashRouter, Route, Routes} from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./Home";
+import AddRecipe from "./AddRecipe";
 
 const App = () => (
-  <HashRouter>
+  <Router>
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/AddRecipe" element={<AddRecipe />} />
     </Routes>
-  </HashRouter>
-  // <Home/>
+  </Router>
 );
 
 const domNode = document.getElementById('app');
