@@ -1,12 +1,11 @@
-﻿using api.Areas.Content.Models;
-using api.Areas.Content.Services.Repositories.Contracts;
+﻿using api.Areas.Recipes.Models;
 using api.Shared;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace api.Areas.Content.Services.Repositories;
+namespace api.Areas.Recipes.Services;
 
-public class ReadOnlyRecipeRepository : IReadOnlyRecipeRepository
+public class RecipeRepository : IRecipeRepository
 {
     private const string UriEnvVariable = "MONGO_COOKBOOK_URI";
     private const string CookbookDatabase = "cb";           // TODO: @JXD - Set these from an appsetting...

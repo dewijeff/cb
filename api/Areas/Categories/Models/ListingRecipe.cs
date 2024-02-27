@@ -1,4 +1,4 @@
-﻿namespace api.Areas.Content.Models;
+﻿namespace api.Areas.Categories.Models;
 
 public class ListingRecipe
 {

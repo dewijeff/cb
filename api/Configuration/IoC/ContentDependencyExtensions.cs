@@ -1,7 +1,6 @@
-﻿using api.Areas.Content.Services;
-using api.Areas.Content.Services.Contracts;
-using api.Areas.Content.Services.Repositories;
-using api.Areas.Content.Services.Repositories.Contracts;
+﻿using api.Areas.Categories.Services;
+using api.Areas.Ingredients.Services;
+using api.Areas.Recipes.Services;
 
 namespace api.Configuration.IoC;
 
@@ -9,9 +8,9 @@ public static class ContentDependencyExtensions
 {
     public static IServiceCollection AddContentServices(this IServiceCollection @this)
     {
-        @this.AddScoped<IReadOnlyRecipeRepository, ReadOnlyRecipeRepository>();
-        @this.AddScoped<IReadOnlyCategoryRepository, ReadOnlyCategoryRepository>();
-        @this.AddScoped<IReadOnlyIngredientRepository, ReadOnlyIngredientRepository>();
+        @this.AddScoped<IRecipeRepository, RecipeRepository>();
+        @this.AddScoped<ICategoryRepository, CategoryRepository>();
+        @this.AddScoped<IIngredientRepository, IngredientRepository>();
         @this.AddScoped<IRecipeDomainService, RecipeDomainService>();
 
         return @this;

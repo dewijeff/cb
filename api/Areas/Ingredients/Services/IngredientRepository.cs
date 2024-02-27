@@ -1,12 +1,11 @@
-﻿using api.Areas.Content.Models;
-using api.Areas.Content.Services.Repositories.Contracts;
+﻿using api.Areas.Recipes.Models;
 using api.Shared.Extensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace api.Areas.Content.Services.Repositories;
+namespace api.Areas.Ingredients.Services;
 
-public class ReadOnlyIngredientRepository : IReadOnlyIngredientRepository
+public class IngredientRepository : IIngredientRepository
 {
     private const string UriEnvVariable = "MONGO_COOKBOOK_URI";
     private const string CookbookDatabase = "cb";           // TODO: @JXD - Set these from an appsetting...
@@ -101,6 +100,14 @@ public class ReadOnlyIngredientRepository : IReadOnlyIngredientRepository
         var ingredients = await collection.Find(filter).ToListAsync(cancellationToken);
 
         // TODO: @JXD - cache these so we don't have to get them from the database again? if I do that - how do you trigger invalidation (hard problem #2)
+
+        return ingredients;
+    }
+
+    public async Task<IEnumerable<Ingredient>> GetIngredients(CancellationToken cancellationToken)
+    {
+        var collection = GetIngredientCollection();
+        var ingredients = await collection.Find(_ => true).ToListAsync(cancellationToken);
 
         return ingredients;
     }

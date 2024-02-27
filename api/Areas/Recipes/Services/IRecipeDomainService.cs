@@ -1,6 +1,6 @@
-﻿using api.Areas.Content.Models;
+﻿using api.Areas.Recipes.Models;
 
-namespace api.Areas.Content.Services.Contracts;
+namespace api.Areas.Recipes.Services;
 
 public interface IRecipeDomainService
 {

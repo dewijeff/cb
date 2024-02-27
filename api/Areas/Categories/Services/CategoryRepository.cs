@@ -1,9 +1,8 @@
-﻿using api.Areas.Content.Models;
-using api.Areas.Content.Services.Repositories.Contracts;
+﻿using api.Areas.Categories.Models;
 
-namespace api.Areas.Content.Services.Repositories;
+namespace api.Areas.Categories.Services;
 
-public class ReadOnlyCategoryRepository : IReadOnlyCategoryRepository
+public class CategoryRepository : ICategoryRepository
 {
     private readonly Dictionary<string, ListingCategory> _categories = new ()
     {

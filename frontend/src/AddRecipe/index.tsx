@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CookbookHeader from "../CookbookHeader";
-import { CookbookName, Recipe } from "../models";
-import { Button, Form, Input, Layout, Select, Space } from "antd";
+import { CookbookName, Ingredient, MeasurementUnit, Recipe } from "../models";
+import { Button, Form, Input, InputNumber, Layout, Select, Space } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import TextArea from "antd/lib/input/TextArea";
+
+type SelectOption = {
+    value: number;
+    label: string;
+}
 
 const AddRecipe = () => {
+    const [ingredients, setIngredients] = useState([{}])
+    const [measurementUnits, setMeasurementUnits] = useState([{}]);
     const recipe: Recipe = {
         id: "",
         name: "",
@@ -13,6 +21,8 @@ const AddRecipe = () => {
         stepGroups: []
     };
   
+    const baseAddress = "https://localhost:7014/"
+
     const [form] = Form.useForm<Recipe>();
     const onFinish = () => {
         // I believe this is where the call to the api to save happens.
@@ -26,12 +36,35 @@ const AddRecipe = () => {
         // toast - not updated
     };
 
+    const getIngredients = useCallback(async () => {
+        const response = await fetch(`${baseAddress}cookbook/ingredients/`);
 
+        if (!response.ok)
+            return null;
 
-    // TODO: @JXD - Get Ingredients from DB
-    // TODO: @JXD - Build Units select options from enum
+        const ingredients:Ingredient[] = await response.json();
+        const options =  ingredients.map((ingredient) => ({value: ingredient.id, label: ingredient.name}));
+
+        return options;
+    }, []);
+
+    useEffect(() => {
+        getIngredients().then(setIngredients);
+
+        // NOTE: The filter only works if the enum is using a number as the value.
+        const measurements = Object.entries(MeasurementUnit).filter(([_, value]) => !isNaN(Number(value))).map(([label, value]) => (
+            {
+                value: value,
+                label: label
+            }
+        ));
+
+        setMeasurementUnits(measurements)
+    }, []);
 
     console.log(form.getFieldsValue());
+
+// TODO: set width to 100% to make space fill the screen style={{width:'100%'}}
 
     return(
         <Layout>
@@ -69,28 +102,13 @@ const AddRecipe = () => {
                                                             {recipeIngredients.map((ingredientField) => (
                                                                 <Space direction="horizontal" key={ingredientField.key}>
                                                                     <Form.Item name={[ingredientField.name, 'ingredientId']}>
-                                                                        <Select placeholder="Select an ingredient" options={[
-                                                                            {value:1, label: 'Flour'},
-                                                                            {value:2, label: 'Water'},
-                                                                            {value:3, label: 'Sugar'},
-                                                                            {value:4, label: 'Milk'},
-                                                                            {value:5, label: 'Butter'},
-                                                                            {value:6, label: 'Unsalted Butter'},
-                                                                            {value:7, label: 'Sodium Free Baking Powder'},
-                                                                            {value:8, label: 'Eggs'},
-                                                                            {value:9, label: 'Salt'}
-                                                                        ]}/>
+                                                                        <Select placeholder="Select an ingredient" options={ingredients}/>
                                                                     </Form.Item>
                                                                     <Form.Item name={[ingredientField.name, 'amount']}>
-                                                                        <Input />
+                                                                        <InputNumber/>
                                                                     </Form.Item>
                                                                     <Form.Item name={[ingredientField.name, 'unit']}>
-                                                                        <Select placeholder='Select a unit' options={[
-                                                                            {value: 1, label: 'Grams'},
-                                                                            {value: 2, label: 'Cups'},
-                                                                            {value: 3, label: 'Tablespoons'},
-                                                                            {value: 4, label: 'Teaspoons'}
-                                                                        ]}/>
+                                                                        <Select placeholder='Select a unit' options={measurementUnits}/>
                                                                     </Form.Item>                                                          
                                                                 <MinusCircleOutlined onClick={() => removeIngredient(ingredientField.name)} />
                                                             </Space>
@@ -104,11 +122,9 @@ const AddRecipe = () => {
                                             </Form.List>
                                         </Space>
                                     ))}
-                                    <Form.Item>
-                                        <Button type="dashed" onClick={() => addIngredientGroup()} block icon={<PlusOutlined />}>
-                                            Add ingredient group
-                                        </Button>
-                                    </Form.Item>
+                                    <Button type="dashed" onClick={() => addIngredientGroup()} block icon={<PlusOutlined />}>
+                                        Add ingredient group
+                                    </Button>
                                 </Space>
                             </>
                         )}
@@ -120,9 +136,12 @@ const AddRecipe = () => {
                                 <Space direction='vertical'>
                                     {stepGroups.map((stepGroup) => (
                                         <Space direction='vertical' key={stepGroup.key}>
-                                            <Form.Item name={[stepGroup.name, 'name']} label='Step Grouping:'>
-                                                <Input/>
-                                            </Form.Item>
+                                            <Space direction="horizontal">
+                                                <Form.Item name={[stepGroup.name, 'name']} label='Step Grouping:'>
+                                                    <Input/>
+                                                </Form.Item>
+                                                <MinusCircleOutlined onClick={() => removeStepGroup(stepGroup.name)}/>
+                                            </Space>
                                             <Form.List name={[stepGroup.name, 'steps']}>
                                                 {(steps, {add: addStep, remove: removeStep}) => (
                                                     <>
@@ -130,10 +149,10 @@ const AddRecipe = () => {
                                                             {steps.map((step) => (
                                                                 <Space direction='horizontal' key={step.key}>
                                                                     <Form.Item name={[step.name, 'title']} label='Title:'>
-                                                                        <Input/>
+                                                                        <TextArea rows={4}/>
                                                                     </Form.Item>
                                                                     <Form.Item name={[step.name, 'instructions']} label='Instructions:'>
-                                                                        <Input/>
+                                                                        <TextArea rows={4}/>
                                                                     </Form.Item>
                                                                     <Form.Item name={[step.name, 'imagePath']} label='Image Path:'>
                                                                         <Input/>
@@ -141,23 +160,19 @@ const AddRecipe = () => {
                                                                     <MinusCircleOutlined onClick={() => removeStep(step.name)}/>
                                                                 </Space>
                                                             ))}
-                                                            <Form.Item>
-                                                                <Button type="dashed" onClick={() => addStep()} block icon={<PlusOutlined />}>
-                                                                    Add recipe step
-                                                                </Button>
-                                                            </Form.Item>
+                                                            <Button type="dashed" onClick={() => addStep()} block icon={<PlusOutlined />}>
+                                                                Add recipe step
+                                                            </Button>
                                                         </Space>
                                                     </>
                                                 )}
                                             </Form.List>
                                         </Space>
                                     ))}
-                                </Space>
-                                <Form.Item>
                                     <Button type="dashed" onClick={() => addStepGroup()} block icon={<PlusOutlined />}>
                                         Add step group
                                     </Button>
-                                </Form.Item>
+                                </Space>
                             </>
                         )}
                     </Form.List>

@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace api.Areas.Content.Models;
+namespace api.Areas.Recipes.Models;
 
 [BsonIgnoreExtraElements]
 [BsonNoId]

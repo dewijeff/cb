@@ -17,7 +17,7 @@ const Home = () => {
     const [categories, setCategories] = useState<ListingCategory[]>(null);
 
     const getCategoryData = useCallback(async () => {
-        const response = await fetch(`${baseAddress}cookbook/contents/`);
+        const response = await fetch(`${baseAddress}cookbook/categories/`);
 
         if (!response.ok)
             return null;
@@ -31,7 +31,7 @@ const Home = () => {
     }, []);
 
     const getRecipe = useCallback(async () => {
-        const url = `${baseAddress}cookbook/recipe?id=${selectedListingRecpie.recipeId}`
+        const url = `${baseAddress}cookbook/recipes/${selectedListingRecpie.recipeId}`
         const response = await fetch(url);
 
         if (!response.ok)

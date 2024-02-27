@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Editor\Services\Contracts\" />
-    <Folder Include="Shared\Models\" />
+    <Folder Include="Areas\Ingredients\Models\" />
   </ItemGroup>
 
 </Project>
