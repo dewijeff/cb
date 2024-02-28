@@ -1,6 +1,7 @@
 ﻿using api.Areas.Ingredients.Services;
 using api.Areas.Recipes.Models;
 using api.Shared.Extensions;
+using MongoDB.Driver;
 
 namespace api.Areas.Recipes.Services;
 
@@ -40,5 +41,25 @@ public class RecipeDomainService : IRecipeDomainService
         }
 
         return recipe;
+    }
+
+    public async Task<Recipe?> AddRecipe(Recipe recipe, CancellationToken cancellationToken)
+    {
+        // TODO: @JXD - why even do this in a domain service.
+        var result = await _recipeRepository.AddRecipe(recipe, cancellationToken);
+
+        // TODO: @JXD - add the recipe to the category associated with it. (string match?)
+
+        return result;
+    }
+
+    public Task<Recipe?> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteRecipe(string id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

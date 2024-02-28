@@ -1,11 +1,11 @@
 import { Recipe } from "./models";
 
-const baseUrl = "https://localhost:7014/"
+const baseUrl = "https://localhost:7014"
 
 // move all network interactions here.
 
-export const AddRecipe = async (recipe: string) => {
-    const response = await fetch(`${baseUrl}/cookbook/recipe`,
+export const AddRecipeToDb = async (recipe: Recipe) => {
+    const response = await fetch(`${baseUrl}/cookbook/recipes`,
     {
         method: 'POST',
         headers: {
@@ -18,7 +18,7 @@ export const AddRecipe = async (recipe: string) => {
 }
 
 export const EditRecipe = async (recipe: string) => {
-    const response = await fetch(`${baseUrl}/cookbook/recipe`,
+    const response = await fetch(`${baseUrl}/cookbook/recipes`,
     {
         method: 'PUT',
         headers: {

@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace api.Areas.Recipes.Models;
+namespace api.Areas.Ingredients.Models;
 
 [BsonIgnoreExtraElements]
 public class Ingredient

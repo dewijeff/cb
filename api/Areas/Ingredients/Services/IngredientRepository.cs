@@ -1,4 +1,5 @@
-﻿using api.Areas.Recipes.Models;
+﻿using api.Areas.Ingredients.Models;
+using api.Shared;
 using api.Shared.Extensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -7,10 +8,6 @@ namespace api.Areas.Ingredients.Services;
 
 public class IngredientRepository : IIngredientRepository
 {
-    private const string UriEnvVariable = "MONGO_COOKBOOK_URI";
-    private const string CookbookDatabase = "cb";           // TODO: @JXD - Set these from an appsetting...
-    private const string IngredientsCollection = "ingredients";
-
     private readonly Dictionary<string, Ingredient> _ingredients = new ()
     {
         {
@@ -91,7 +88,7 @@ public class IngredientRepository : IIngredientRepository
 
     public async Task<IEnumerable<Ingredient>?> GetIngredients(IEnumerable<string> ingredientIds, CancellationToken cancellationToken)
     {
-        var collection = GetIngredientCollection();
+        var collection = MongoUtility.GetCollection<Ingredient>();
 
         var objectIds = ingredientIds.EmptyIfNull().Select(ObjectId.Parse);
 
@@ -106,21 +103,9 @@ public class IngredientRepository : IIngredientRepository
 
     public async Task<IEnumerable<Ingredient>> GetIngredients(CancellationToken cancellationToken)
     {
-        var collection = GetIngredientCollection();
+        var collection = MongoUtility.GetCollection<Ingredient>();
         var ingredients = await collection.Find(_ => true).ToListAsync(cancellationToken);
 
         return ingredients;
     }
-
-    // TODO: Move this to a generic at the database layer that takes a type and a collectionName string and returns the collection for use across all repositories
-    private IMongoCollection<Ingredient> GetIngredientCollection()
-    {
-        var connectionString = Environment.GetEnvironmentVariable(UriEnvVariable);
-        if (connectionString == null)
-            throw new Exception("Invalid Mongo Connection String");
-
-        var client = new MongoClient(connectionString);
-        return client.GetDatabase(CookbookDatabase).GetCollection<Ingredient>(IngredientsCollection);
-    }
-    // TODO: method to get ALL ingredients for editor...
 }

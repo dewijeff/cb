@@ -31,19 +31,18 @@ public class RecipesController : Controller
     [Route("recipes")]
     public async Task<IActionResult> AddRecipe([FromBody] Recipe request, CancellationToken cancellationToken)
     {
-        // add item to repository
-        var something = request;
+        var recipe = await _recipeDomainService.AddRecipe(request, cancellationToken);
 
-        return Json(something, _jsonSettings);
+        return Json(recipe, _jsonSettings);
     }
 
     [HttpPut]
     [Route("recipes/{id}")]
     public async Task<IActionResult> UpdateRecipe(string id, [FromBody] Recipe request, CancellationToken cancellationToken)
     {
-        // update item in repository
+        var recipe = await _recipeDomainService.UpdateRecipe(id, request, cancellationToken);
 
-        return new OkResult();
+        return Json(recipe, _jsonSettings);
     }
 
     [HttpDelete]

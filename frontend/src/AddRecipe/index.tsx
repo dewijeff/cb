@@ -4,6 +4,7 @@ import { CookbookName, Ingredient, MeasurementUnit, Recipe } from "../models";
 import { Button, Form, Input, InputNumber, Layout, Select, Space } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from "antd/lib/input/TextArea";
+import { AddRecipeToDb } from "../network";
 
 type SelectOption = {
     value: number;
@@ -24,11 +25,17 @@ const AddRecipe = () => {
     const baseAddress = "https://localhost:7014/"
 
     const [form] = Form.useForm<Recipe>();
-    const onFinish = () => {
+    const onFinish = async () => {
         // I believe this is where the call to the api to save happens.
 
         console.log('formdata', form.getFieldsValue());
         // take you back to the home page with the main recipe selected?
+
+        var recipe = form.getFieldsValue();
+
+        await AddRecipeToDb(recipe);
+
+        // Navigate to home page with newly added recipe selected (will require a reducer to store the update here and get it there...)
     };
 
     const onFinishFailed = (errorinfo: any) => {

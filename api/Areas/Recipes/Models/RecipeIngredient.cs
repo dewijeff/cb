@@ -1,4 +1,5 @@
-﻿using api.Shared;
+﻿using api.Areas.Ingredients.Models;
+using api.Shared;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -14,6 +15,7 @@ public class RecipeIngredient
     [BsonElement("ingredients_id"), BsonRepresentation(BsonType.ObjectId)]
     public string IngredientId { get; set; } = string.Empty;
 
+    [BsonIgnore]
     public Ingredient? Ingredient { get; set; }
 
     [BsonElement("amount")]

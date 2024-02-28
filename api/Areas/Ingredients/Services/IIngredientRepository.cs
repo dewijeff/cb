@@ -1,4 +1,5 @@
-﻿using api.Areas.Recipes.Models;
+﻿using api.Areas.Ingredients.Models;
+using api.Areas.Recipes.Models;
 
 namespace api.Areas.Ingredients.Services;
 
