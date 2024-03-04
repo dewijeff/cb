@@ -1,0 +1,19 @@
+.headerRow {
+    display: grid;
+    grid-template-columns: 25%, 50%, 25%;
+}
+
+.headerLeft {
+    text-align: left;
+    grid-column: 1;
+}
+
+.cookbookTitle {
+    text-align: center;
+    grid-column: 2;
+}
+
+.headerRight {
+    text-align: right;
+    grid-column: 3;
+}
