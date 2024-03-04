@@ -54,7 +54,7 @@ export type RecipeStepGroup = {
 export type Recipe = {
     id: string;
     name: string;
-    category: string;
+    categoryId: string;
     ingredientGroups: IngredientGroup[];
     stepGroups: RecipeStepGroup[];
     notes?: string;
@@ -77,14 +77,15 @@ export type ListingRecipe = {
 }
 
 export type ListingCategory = {
+    id: string;
     order: number;
     name: string;
     recipes: ListingRecipe[];
     notes?: string; 
 }
 
-export type Category = {
-    id: string;
-    name: string;
-    recipes: Recipe[];
-};
+// export type Category = {
+//     id: string;
+//     name: string;
+//     recipes: Recipe[];
+// };

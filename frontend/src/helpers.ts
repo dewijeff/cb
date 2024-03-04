@@ -1,4 +1,4 @@
-import { Category, MeasurementUnit, Recipe } from "./models";
+import { MeasurementUnit } from "./models";
 
 export function GetIngredientNameString(count: number, name: string, hideUnit: boolean)
 {
@@ -21,14 +21,3 @@ export function GetUnitsString(count: number, unitsEnum: number, hideUnit: boole
     return units + 's';
 }
 
-export type State = {
-    categories: Category[];
-    selectedCategory?: Category;
-    selectedRecipe?: Recipe;
-};
-
-const initialState: State = {
-    categories: [],
-    selectedCategory: null,
-
-}

@@ -8,13 +8,13 @@ public class Recipe
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; } = string.Empty;
+    public string? Id { get; set; }
 
     [BsonElement("name")]
     public string Name { get; set; } = string.Empty;
 
-    [BsonElement("category")]
-    public string Category { get; set; } = string.Empty;
+    [BsonElement("categoryId")]
+    public string? CategoryId { get; set; }
 
     [BsonElement("ingredientGroups")]
     public IEnumerable<IngredientGroup> IngredientGroups { get; set; } = Enumerable.Empty<IngredientGroup>();

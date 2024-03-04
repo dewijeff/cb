@@ -1,29 +1,20 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CookbookHeader from "../CookbookHeader";
-import { CookbookName, Ingredient, MeasurementUnit, Recipe } from "../models";
+import { CookbookName, MeasurementUnit, Recipe } from "../models";
 import { Button, Form, Input, InputNumber, Layout, Select, Space } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from "antd/lib/input/TextArea";
-import { AddRecipeToDb } from "../network";
+import { AddDbRecipe, GetDbCategories, GetDbIngredients } from "../network";
+import { useNavigate } from "react-router-dom";
+import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../selectedItemReducer";
 
-type SelectOption = {
-    value: number;
-    label: string;
-}
-
-const AddRecipe = () => {
-    const [ingredients, setIngredients] = useState([{}])
+const EditRecipe = () => {
+    const [ingredients, setIngredients] = useState([{}]);
+    const [categories, setCategories] = useState([{}]);
     const [measurementUnits, setMeasurementUnits] = useState([{}]);
-    const recipe: Recipe = {
-        id: "",
-        name: "",
-        category: "",
-        ingredientGroups: [],
-        stepGroups: []
-    };
-  
-    const baseAddress = "https://localhost:7014/"
+    const cookbookDispatch = useContext(CookbookDispatchContext);
 
+    const navigate = useNavigate();
     const [form] = Form.useForm<Recipe>();
     const onFinish = async () => {
         // I believe this is where the call to the api to save happens.
@@ -33,9 +24,12 @@ const AddRecipe = () => {
 
         var recipe = form.getFieldsValue();
 
-        await AddRecipeToDb(recipe);
+        const recipeResult = await AddDbRecipe(recipe);
+
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID, payload: recipeResult.id });
 
         // Navigate to home page with newly added recipe selected (will require a reducer to store the update here and get it there...)
+        navigate("/");
     };
 
     const onFinishFailed = (errorinfo: any) => {
@@ -43,20 +37,14 @@ const AddRecipe = () => {
         // toast - not updated
     };
 
-    const getIngredients = useCallback(async () => {
-        const response = await fetch(`${baseAddress}cookbook/ingredients/`);
-
-        if (!response.ok)
-            return null;
-
-        const ingredients:Ingredient[] = await response.json();
-        const options =  ingredients.map((ingredient) => ({value: ingredient.id, label: ingredient.name}));
-
-        return options;
-    }, []);
-
     useEffect(() => {
-        getIngredients().then(setIngredients);
+        GetDbIngredients()
+        .then((ingredients) => ingredients.map((ingredient) => ({value: ingredient.id, label: ingredient.name})))
+        .then(setIngredients);
+
+        GetDbCategories()
+        .then((categories) => categories.map((category) => ({value: category.id, label: category.name})))
+        .then(setCategories);
 
         // NOTE: The filter only works if the enum is using a number as the value.
         const measurements = Object.entries(MeasurementUnit).filter(([_, value]) => !isNaN(Number(value))).map(([label, value]) => (
@@ -66,7 +54,7 @@ const AddRecipe = () => {
             }
         ));
 
-        setMeasurementUnits(measurements)
+        setMeasurementUnits(measurements);
     }, []);
 
     console.log(form.getFieldsValue());
@@ -83,12 +71,20 @@ const AddRecipe = () => {
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}>
                 <Space direction='vertical'>
-                        <Form.Item 
-                        label="Recipe Name:"
-                        name="name"
-                        rules={[{required: true, message: 'Please input a recipe name'}]}>
-                        <Input />
-                    </Form.Item>
+                        <Space direction='horizontal'>
+                            <Form.Item 
+                                label="Recipe Name:"
+                                name="name"
+                                rules={[{required: true, message: 'Please input a recipe name'}]}>
+                                <Input />
+                            </Form.Item>
+                            <Form.Item 
+                                label="Recipe Category:"
+                                name="categoryId"
+                                rules={[{required: true, message: 'Please input a recipe name'}]}>
+                                <Select placeholder="Select a category" options={categories} />
+                            </Form.Item>
+                        </Space>
                     <h3>Ingredients</h3>
                     <Form.List name="ingredientGroups">
                         {(ingredientGroups, {add: addIngredientGroup, remove: removeIngredientGroup}) => (
@@ -183,15 +179,13 @@ const AddRecipe = () => {
                             </>
                         )}
                     </Form.List>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            Add
-                        </Button>
-                    </Form.Item>
+                    <Button type="primary" htmlType="submit">
+                        Add
+                    </Button>
                 </Space>
             </Form>
         </Layout>
     );
-}
+};
 
-export default AddRecipe;
+export default EditRecipe;

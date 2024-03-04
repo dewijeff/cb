@@ -1,21 +1,25 @@
 using api.Configuration.IoC;
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+const string myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddContentServices();
+//builder.Services.AddContentServices();
+builder.Services.AddRecipesServices();
+builder.Services.AddIngredientsServices();
+builder.Services.AddCategoriesServices();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Allow cross origin - because I'll likely be hosting these separate until I get them on a host server that uses a reverse proxy like Nginx?
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
-        name: MyAllowSpecificOrigins,
+        name: myAllowSpecificOrigins,
         policy =>
         {
             policy
@@ -41,7 +45,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors(myAllowSpecificOrigins);
 
 app.UseAuthorization();
 

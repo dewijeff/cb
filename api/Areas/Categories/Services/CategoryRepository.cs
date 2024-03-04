@@ -1,99 +1,54 @@
 ﻿using api.Areas.Categories.Models;
+using api.Shared;
+using MongoDB.Driver;
 
 namespace api.Areas.Categories.Services;
 
 public class CategoryRepository : ICategoryRepository
 {
-    private readonly Dictionary<string, ListingCategory> _categories = new ()
-    {
-        {
-            "1", new ListingCategory
-            {
-                Order = 1,
-                Name = "Breads",
-                Notes = null,
-                Recipes = new[]
-                {
-                    new ListingRecipe
-                    {
-                        Name = "Shokupan",
-                        RecipeId = "65d6392bdffb266ad688a0f3",
-                    },
-                    new ListingRecipe
-                    {
-                        Name = "Italian Bread",
-                        RecipeId = "65d6392bdffb266ad688a0f4",
-                    },
-                    new ListingRecipe
-                    {
-                        Name = "Hamburger Buns",
-                        RecipeId = "65d6392bdffb266ad688a0f5",
-                    },
-                    new ListingRecipe
-                    {
-                        Name = "Hoagie Rolls",
-                        RecipeId = "65d6392bdffb266ad688a0f6",
-                    },
-                    new ListingRecipe
-                    {
-                        Name = "Low Sodium Bisquick",
-                        RecipeId = "65d635eddffb266ad688a0e4",
-                    },
-                    new ListingRecipe
-                    {
-                        Name = "Pizza Dough",
-                        RecipeId = "65d6392bdffb266ad688a0f7",
-                    }
-                }
-            }
-        },
-        {
-            "2", new ListingCategory
-            {
-                Order = 2,
-                Name = "Breakfasts",
-                Notes = null,
-                Recipes = new[]
-                {
-                    new ListingRecipe
-                    {
-                        Name = "Sausage Gravy",
-                        RecipeId = "65d6392bdffb266ad688a0f8",
-                    },
-                    new ListingRecipe
-                    {
-                        Name = "Breakfast Squares",
-                        RecipeId = "65d6392bdffb266ad688a0f9"
-                    }
-                }
-            }
-        },
-        {
-            "3", new ListingCategory
-            {
-                Order = 3,
-                Name = "Other",
-                Notes = null,
-                Recipes = new[]
-                {
-                    new ListingRecipe
-                    {
-                        Name = "Christmas Pudding",
-                        RecipeId = "65d6392bdffb266ad688a0fa",
-                    },
-                    new ListingRecipe
-                    {
-                        Name = "Advocaat",
-                        RecipeId = "65d6392bdffb266ad688a0fb"
-                    }
-                }
-            }
-        }
-    };
-
     public async Task<IEnumerable<ListingCategory>> GetCategories(CancellationToken cancellationToken)
     {
-        // This will be database based later, and will use th
-        return _categories.Values;
+        var collection = MongoUtility.GetCollection<ListingCategory>();
+        var categories = await collection.Find(_ => true).ToListAsync(cancellationToken);
+
+        return categories;
+    }
+
+    public async Task<ListingCategory> GetCategoryById(string id, CancellationToken cancellationToken)
+    {
+        var collection = MongoUtility.GetCollection<ListingCategory>();
+
+        var filter = Builders<ListingCategory>.Filter.Eq(x => x.Id, id);
+        var result = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+
+        return result;
+    }
+
+    public async Task<ListingCategory> AddCategory(ListingCategory category, CancellationToken cancellationToken)
+    {
+        var collection = MongoUtility.GetCollection<ListingCategory>();
+
+        await collection.InsertOneAsync(category, new InsertOneOptions(), cancellationToken);
+
+        return category;
+    }
+
+    public async Task<long> EditCategory(ListingCategory category, CancellationToken cancellationToken)
+    {
+        var collection = MongoUtility.GetCollection<ListingCategory>();
+
+        var filter = Builders<ListingCategory>.Filter.Eq(x => x.Id, category.Id);
+        // TODO: DO I really want to do a replace (I think so?) vs updating or some kind of merge?
+        var results = await collection.ReplaceOneAsync(filter, category, new ReplaceOptions(), cancellationToken);
+        return results.ModifiedCount;
+    }
+
+    public async Task<bool> DeleteCategory(string id, CancellationToken cancellationToken)
+    {
+        var collection = MongoUtility.GetCollection<ListingCategory>();
+
+        var result = await collection.DeleteOneAsync(id, cancellationToken);
+
+        return result.DeletedCount > 0;
     }
 }
