@@ -46,6 +46,11 @@ export const AddDbRecipe = async (recipe: Recipe) => {
         body: JSON.stringify(recipe),
     });
 
+    if (!response.ok)
+    {
+        throw Error("Error Adding Recipe");
+    }
+
     const recipeResponse: Recipe = await response.json();
     return recipeResponse; // now it has the id populated.
 };
@@ -61,6 +66,12 @@ export const EditDbRecipe = async (recipe: Recipe) => {
         body: JSON.stringify(recipe),
     });
 
+
+    if (!response.ok)
+    {
+        throw Error("Error Editing Recipe");
+    }
+
     return response;
 };
 
@@ -69,6 +80,12 @@ export const DeleteDbRecipe = async (recipeId: string) => {
     {
         method: 'DELETE',
     });
+
+    
+    if (!response.ok)
+    {
+        throw Error("Error Deleting Recipe");
+    }
 
     return response;
 }
@@ -95,6 +112,12 @@ export const AddDbIngredient = async (ingredient: Ingredient) => {
         body: JSON.stringify(ingredient),
     });
 
+
+    if (!response.ok)
+    {
+        throw Error("Error Adding Ingredient");
+    }
+
     return response;
 };
 
@@ -108,6 +131,11 @@ export const EditDbIngredient = async (ingredient: Ingredient) => {
         body: JSON.stringify(ingredient),
     });
 
+    if (!response.ok)
+    {
+        throw Error("Error Editing Ingredient");
+    }
+
     return response;
 };
 
@@ -116,6 +144,11 @@ export const DeleteDbIngredient = async (ingredientId: string) => {
     {
         method: 'DELETE'
     });
+
+    if (!response.ok)
+    {
+        throw Error("Error Deleting Ingredient");
+    }
 
     return response;
 };

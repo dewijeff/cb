@@ -35,7 +35,7 @@ public class IngredientsController : Controller
     [Route("ingredients")]
     public async Task<IActionResult> AddIngredient([FromBody] Ingredient ingredient, CancellationToken cancellationToken)
     {
-        var result = _ingredientDomainService.AddIngredient(ingredient, cancellationToken);
+        var result = await _ingredientDomainService.AddIngredient(ingredient, cancellationToken);
 
         return Json(result, _jsonSettings);
     }

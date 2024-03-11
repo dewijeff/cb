@@ -1,4 +1,5 @@
-﻿using api.Areas.Recipes.Models;
+﻿using api.Areas.Ingredients.Models;
+using api.Areas.Recipes.Models;
 using api.Shared;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -30,13 +31,22 @@ public class RecipeRepository : IRecipeRepository
         return recipe;
     }
 
-    public Task<Recipe?> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
+    public async Task<long> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var collection = MongoUtility.GetCollection<Recipe>();
+
+        var filter = Builders<Recipe>.Filter.Eq("_id", ObjectId.Parse(id));
+        var results = await collection.ReplaceOneAsync(filter, recipe, new ReplaceOptions(), cancellationToken);
+
+        return results.ModifiedCount;
     }
 
-    public Task<Recipe?> DeleteRecipe(string id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteRecipe(string id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var collection = MongoUtility.GetCollection<Recipe>();
+
+        var result = await collection.DeleteOneAsync(id, cancellationToken);
+
+        return result.DeletedCount > 0;
     }
 }

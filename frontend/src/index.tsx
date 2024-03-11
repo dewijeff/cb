@@ -4,7 +4,8 @@ import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./Home";
 import EditRecipe from "./EditRecipe";
 import EditIngredient from "./EditIngredient";
-import { CookbookDispatchContext, CookbookStateContext, cookbookInitialState, CookbookReducer, } from "./selectedItemReducer";
+import { CookbookDispatchContext, CookbookStateContext, cookbookInitialState, CookbookReducer, } from "./CookbookReducer";
+import About from "./About";
 
 // Edit will be the same component as add, just with an ?id={id} on the end. - not sure how to really do that.
 
@@ -17,10 +18,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/AddRecipe" element={<EditRecipe />} />
-            <Route path="/AddIngredient" element={<EditIngredient />} />
-            <Route path="/EditRecipe" element={<EditRecipe />} />         
-            <Route path="/EditIngredient" element={<EditIngredient />} />
+            <Route path="/about" element={<About/>} />
           </Routes>
         </Router>
       </CookbookDispatchContext.Provider>

@@ -5,7 +5,7 @@ import 'antd/dist/antd.css';
 
 const IngredientGroupSection = (group : IngredientGroup) => (
     <div className="ingredient-group" key={group.name + group.order}>
-        <h4 className="ingredient-group-name">{group.name}</h4>
+        <h3 className="ingredient-group-name">{group.name}</h3>
         {group.recipeIngredients?.sort((a, b) => a.order - b.order).map(x => RecipeIngredient(x))}
     </div>
 );

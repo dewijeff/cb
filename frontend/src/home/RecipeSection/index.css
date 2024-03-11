@@ -1,3 +1,19 @@
+.recipeTitle-container {
+    padding: "auto";
+    display: "grid";
+    grid-template-columns: 75% 25%;
+}
+
+.recipeTitleLeft {
+    text-align: left;
+    grid-column: 1;
+}
+
+.recipeTitleRight {
+    text-align: right;
+    grid-column: 3;
+}
+
 .ingredients-container {
     display: grid;
     grid-template-columns: 2% 3% 30% 5% 55%;

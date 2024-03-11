@@ -8,7 +8,7 @@ public interface IRecipeDomainService
 
     public Task<Recipe?> AddRecipe(Recipe recipe, CancellationToken cancellationToken);
 
-    public Task<Recipe?> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken);
+    public Task<long> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken);
 
-    public Task DeleteRecipe(string id, CancellationToken cancellationToken);
+    public Task<bool> DeleteRecipe(string id, CancellationToken cancellationToken);
 }

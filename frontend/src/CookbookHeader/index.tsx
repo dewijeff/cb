@@ -1,14 +1,26 @@
 import { Header } from "antd/lib/layout/layout";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import './index.css';
-import { Space } from "antd";
+import { Button, Space } from "antd";
+import EditIngredient from "../EditIngredient";
+import EditRecipe from "../EditRecipe";
 
 interface Props {
     cookbookName: string;
 };
 
 const CookbookHeader = ({cookbookName} : Props) => {
+    const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false);
+    const [isAddIngredientOpen, setIsAddIngredientOpen] = useState(false);
+
+    const handleCloseRecipeModal = () => {
+        setIsAddRecipeOpen(false);
+    };
+
+    const handleCloseIngredientModal = () => {
+        setIsAddIngredientOpen(false);
+    };
+
     return(
         <Header>
             <div 
@@ -25,13 +37,15 @@ const CookbookHeader = ({cookbookName} : Props) => {
                 </div>
                 <div className='headerRight'>
                     <Space direction='horizontal'>
-                        <Link style={{}} to="/AddRecipe">Add Recipe</Link>
-                        <Link to="/AddIngredient">Add Ingredient</Link>
+                        <Button onClick={() => setIsAddRecipeOpen(true)}>Add Recipe</Button>
+                        <Button onClick={() => setIsAddIngredientOpen(true)}>Add Ingredient</Button>
+                        <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal}/>
+                        <EditIngredient isOpen={isAddIngredientOpen} handleClose={handleCloseIngredientModal} />
                     </Space>
                 </div>
             </div>
         </Header>
     );
-}
+};
 
 export default CookbookHeader;

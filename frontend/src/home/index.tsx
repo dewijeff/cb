@@ -2,16 +2,18 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Spin } from 'antd'
 import { ListingCategory, Recipe, CookbookName } from '../models';
 import RecipeSection from './RecipeSection';
 import CookbookHeader from '../CookbookHeader';
 import { GetDbCategories, GetDbRecipe } from '../network';
-import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../selectedItemReducer';
+import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../CookbookReducer';
 const { Content, Sider } = Layout;
 
 const Home = () => {
     // const [selectedListingRecpie, setSelectedListingRecipe] = useState<ListingRecipe | null>(null);
+    const [contentsLoading, setContentsLoading] = useState(true);
+    const [errorLoadingContents, setErrorLoadingContents] = useState(false);
     const [recipeLoading, setRecipeLoading] = useState(false);
     const [recipe, setRecipe] = useState<Recipe | undefined>(null);
     const [categories, setCategories] = useState<ListingCategory[]>(null);
@@ -21,15 +23,28 @@ const Home = () => {
     const cookbookDispatch = useContext(CookbookDispatchContext);
 
     const handleLoad = async () => {
-        const categories = await GetDbCategories();
-        setCategories(categories);
+        setContentsLoading(true);
 
-        if (cookbookState.selectedRecipeId)
+        let categories: ListingCategory[];
+        try {
+            categories = await GetDbCategories();
+
+            setCategories(categories);
+
+            if (cookbookState.selectedRecipeId)
+            {
+                setSelectedMenuItems([cookbookState.selectedRecipeId]);
+                const openItem = categories.find(x => x.recipes.find(y => y.recipeId == cookbookState.selectedRecipeId));
+                setOpenCategories([openItem.order.toString()])
+            };
+        } catch(e)
         {
-            setSelectedMenuItems([cookbookState.selectedRecipeId]);
-            const openItem = categories.find(x => x.recipes.find(y => y.recipeId == cookbookState.selectedRecipeId));
-            setOpenCategories([openItem.order.toString()])
-        };
+            console.log("Error loading contents", e)
+            setErrorLoadingContents(true);
+        }
+        finally {
+            setContentsLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -76,30 +91,37 @@ const Home = () => {
         <Layout>
             <CookbookHeader cookbookName={CookbookName}/>
             <Content>
-                <Layout>
-                    <Sider>
-                        <Menu
-                            mode="inline"
-                            defaultSelectedKeys={['1']}
-                            style={{ height: '100%', borderRight: 0 }}
-                            items={siderItems}
-                            selectedKeys={selectedMenuItems}
-                            openKeys={openCategories}
-                            onOpenChange={handleOpenChange}
-                            onSelect={handleMenuSelect}
-                        />
-                    </Sider>
-                    <Content>
-                        <div>
-                            {!!recipe
-                                ?
-                                    (<RecipeSection recipe={recipe} loading={recipeLoading}/>)
-                                :
-                                    <h2>{recipe?.name ?? "Select A Recipe"}</h2>
-                            }
-                        </div>
-                    </Content>
-                </Layout>
+                <Spin spinning={contentsLoading}>
+                    {contentsLoading ? (
+                        <>
+                        </>
+                    ) : (
+                        <Layout>
+                            <Sider>
+                                <Menu
+                                    mode="inline"
+                                    defaultSelectedKeys={['1']}
+                                    style={{ height: '100%', borderRight: 0 }}
+                                    items={siderItems}
+                                    selectedKeys={selectedMenuItems}
+                                    openKeys={openCategories}
+                                    onOpenChange={handleOpenChange}
+                                    onSelect={handleMenuSelect}
+                                />
+                            </Sider>
+                            <Content>
+                                <div>
+                                    {!!recipe
+                                        ?
+                                            (<RecipeSection recipe={recipe} loading={recipeLoading} />)
+                                        :
+                                            <h2>{recipe?.name ?? "Select A Recipe"}</h2>
+                                    }
+                                </div>
+                            </Content>
+                        </Layout>
+                    )}
+                </Spin>
             </Content>
         </Layout>
     );

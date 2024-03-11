@@ -30,11 +30,11 @@ public class RecipeDomainService : IRecipeDomainService
             return null;
 
         var allIngredients =
-            recipe.IngredientGroups.SelectMany(x => x.RecipeIngredients.Select(y => y.IngredientId)).EmptyIfNull().ToHashSet();
+            recipe.IngredientGroups.SelectMany(x => x.RecipeIngredients.EmptyIfNull().Select(y => y.IngredientId)).EmptyIfNull().ToHashSet();
 
         if (allIngredients?.Any() == true)
         {
-            var ingredients = (await _ingredientRepository.GetIngredients(allIngredients.EmptyIfNull(), cancellationToken)).EmptyIfNull().ToDictionary(x => x.Id);
+            var ingredients = (await _ingredientRepository.GetIngredients(allIngredients.EmptyIfNull(), cancellationToken)).EmptyIfNull().Where(x => x.Id != null).ToDictionary(x => x.Id!);
             foreach (var ingredientGroup in recipe.IngredientGroups)
             {
                 foreach (var recipeIngredient in ingredientGroup.RecipeIngredients)
@@ -69,12 +69,40 @@ public class RecipeDomainService : IRecipeDomainService
         return result;
     }
 
-    public Task<Recipe?> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
+    public async Task<long> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _recipeRepository.UpdateRecipe(id, recipe, cancellationToken);
+
+        var categories = (await _categoryRepository.GetCategories(cancellationToken)).ToList();
+        var recipesDictionary = categories
+            .SelectMany(x => x.Recipes.Select(y => new { y.RecipeId, CategoryId = x.Id }))
+            .ToDictionary(x => x.RecipeId, x => x.CategoryId);
+
+        recipesDictionary.TryGetValue(id, out var originalRecipeCategory);
+        if (originalRecipeCategory != recipe.CategoryId)
+        {
+            if (originalRecipeCategory != null)
+            {
+                var originalCategory = await _categoryRepository.GetCategoryById(originalRecipeCategory, cancellationToken);
+
+                // TODO: @JXD - This feels like it is harder than it should be - what am I missing?
+                var newRecipesList = originalCategory.Recipes.ToList();
+                newRecipesList.Remove(originalCategory.Recipes.First(x => x.RecipeId == recipe.Id));
+                originalCategory.Recipes = newRecipesList;
+                await _categoryRepository.EditCategory(originalCategory, cancellationToken);
+            }
+
+            var newCategory = await _categoryRepository.GetCategoryById(recipe.CategoryId!, cancellationToken);
+
+            newCategory.Recipes = newCategory.Recipes.Append(new ListingRecipe { Name = recipe.Name, RecipeId = recipe.Id! });
+
+            await _categoryRepository.EditCategory(newCategory, cancellationToken);
+        }
+
+        return result;
     }
 
-    public Task DeleteRecipe(string id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteRecipe(string id, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
 
