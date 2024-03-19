@@ -21,7 +21,6 @@ export type Ingredient = {
 };
 
 export type RecipeIngredient = {
-    order: number;
     ingredientId: string;
     ingredient: Ingredient;
     amount: number;
@@ -31,14 +30,12 @@ export type RecipeIngredient = {
 
 export type IngredientGroup = {
     // id: string;
-    order: number;
     name: string;
     recipeIngredients: RecipeIngredient[];
 }
 
 export type RecipeStep = {
     // id: string;
-    order: number;
     title: string;
     instructions?: string;
     imagePath?: string;
@@ -46,7 +43,6 @@ export type RecipeStep = {
 
 export type RecipeStepGroup = {
     // id: string;
-    order: number;
     name: string;   // describe the step - i.e. for the tangzhong, for the frosting v. for the cake...
     steps: RecipeStep[];
 };

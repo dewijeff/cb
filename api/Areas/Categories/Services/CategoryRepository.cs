@@ -30,7 +30,12 @@ public class CategoryRepository : ICategoryRepository
 
         await collection.InsertOneAsync(category, new InsertOneOptions(), cancellationToken);
 
-        return category;
+        var filter = Builders<ListingCategory>.Filter.Eq("_id", category.Id);
+
+        // get the result to make sure it took.  this is the new state...
+        var result = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+
+        return result;
     }
 
     public async Task<long> EditCategory(ListingCategory category, CancellationToken cancellationToken)
@@ -38,7 +43,6 @@ public class CategoryRepository : ICategoryRepository
         var collection = MongoUtility.GetCollection<ListingCategory>();
 
         var filter = Builders<ListingCategory>.Filter.Eq(x => x.Id, category.Id);
-        // TODO: DO I really want to do a replace (I think so?) vs updating or some kind of merge?
         var results = await collection.ReplaceOneAsync(filter, category, new ReplaceOptions(), cancellationToken);
         return results.ModifiedCount;
     }

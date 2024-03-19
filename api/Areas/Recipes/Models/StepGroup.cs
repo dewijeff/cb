@@ -6,8 +6,6 @@ namespace api.Areas.Recipes.Models;
 [BsonNoId]
 public class StepGroup
 {
-    [BsonElement("order")]
-    public int Order { get; set; }
 
     [BsonElement("name")]
     public string Name { get; set; } = string.Empty;

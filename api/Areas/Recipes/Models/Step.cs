@@ -6,9 +6,6 @@ namespace api.Areas.Recipes.Models;
 [BsonNoId]
 public class Step
 {
-    [BsonElement("order")]
-    public int Order { get; set; }
-
     [BsonElement("title")]
     public string Title { get; set; } = string.Empty;
 

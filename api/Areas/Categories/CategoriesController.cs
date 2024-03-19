@@ -39,4 +39,16 @@ public class CategoriesController : Controller
 
         return Json(response, _jsonSettings);
     }
+
+    [HttpDelete]
+    [Route("categories/{id}")]
+    public async Task<IActionResult> DeleteCategory(string id, CancellationToken cancellationToken)
+    {
+        var result = await _categoryDomainService.DeleteCategory(id, cancellationToken);
+
+        if (result)
+            return Ok();
+
+        return NotFound();
+    }
 }

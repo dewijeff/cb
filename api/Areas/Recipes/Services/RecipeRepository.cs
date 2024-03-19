@@ -1,5 +1,4 @@
-﻿using api.Areas.Ingredients.Models;
-using api.Areas.Recipes.Models;
+﻿using api.Areas.Recipes.Models;
 using api.Shared;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -8,44 +7,59 @@ namespace api.Areas.Recipes.Services;
 
 public class RecipeRepository : IRecipeRepository
 {
+    private readonly IMongoCollection<Recipe> _collection;
+
+    public RecipeRepository()
+    {
+        // TODO: @JLD - This will be converted to dependency injection in the next iteration.
+        _collection = MongoUtility.GetCollection<Recipe>();
+    }
+
     public async Task<Recipe?> GetRecipe(string id, CancellationToken cancellationToken)
     {
-        var collection = MongoUtility.GetCollection<Recipe>();
 
         var filter = Builders<Recipe>.Filter.Eq("_id", ObjectId.Parse(id));
 
-        var recipe = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        var recipe = await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
 
         return recipe;
+    }
+
+    public async Task<long> GetCategoryRecipeCount(string categoryId, CancellationToken cancellationToken)
+    {
+        var filter = Builders<Recipe>.Filter.Eq("categoryId", categoryId);
+
+        var count = await _collection.CountDocumentsAsync(filter, new CountOptions(),cancellationToken);
+
+        return count;
     }
 
     public async Task<Recipe?> AddRecipe(Recipe recipe, CancellationToken cancellationToken)
     {
-        var collection = MongoUtility.GetCollection<Recipe>();
-
         var options = new InsertOneOptions();
 
-        await collection.InsertOneAsync(recipe, options, cancellationToken);
+        await _collection.InsertOneAsync(recipe, options, cancellationToken);
 
-        // id should now be the new insert id? (according to the documentation)
         return recipe;
     }
 
-    public async Task<long> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
+    public async Task<Recipe?> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
     {
-        var collection = MongoUtility.GetCollection<Recipe>();
-
         var filter = Builders<Recipe>.Filter.Eq("_id", ObjectId.Parse(id));
-        var results = await collection.ReplaceOneAsync(filter, recipe, new ReplaceOptions(), cancellationToken);
+        var results = await _collection.ReplaceOneAsync(filter, recipe, new ReplaceOptions(), cancellationToken);
 
-        return results.ModifiedCount;
+        if (results.ModifiedCount != 1)
+            return null;
+
+        // Could probably just return the recipe we passed in, but getting a new copy from the db guarantees the return matches what is on the db
+
+        var recipeResult = await _collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+        return recipeResult;
     }
 
     public async Task<bool> DeleteRecipe(string id, CancellationToken cancellationToken)
     {
-        var collection = MongoUtility.GetCollection<Recipe>();
-
-        var result = await collection.DeleteOneAsync(id, cancellationToken);
+        var result = await _collection.DeleteOneAsync(id, cancellationToken);
 
         return result.DeletedCount > 0;
     }

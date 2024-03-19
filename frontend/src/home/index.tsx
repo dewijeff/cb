@@ -3,7 +3,7 @@ import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
 import { Layout, Menu, Spin } from 'antd'
-import { ListingCategory, Recipe, CookbookName } from '../models';
+import { ListingCategory, CookbookName } from '../models';
 import RecipeSection from './RecipeSection';
 import CookbookHeader from '../CookbookHeader';
 import { GetDbCategories, GetDbRecipe } from '../network';
@@ -11,11 +11,9 @@ import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_A
 const { Content, Sider } = Layout;
 
 const Home = () => {
-    // const [selectedListingRecpie, setSelectedListingRecipe] = useState<ListingRecipe | null>(null);
     const [contentsLoading, setContentsLoading] = useState(true);
     const [errorLoadingContents, setErrorLoadingContents] = useState(false);
     const [recipeLoading, setRecipeLoading] = useState(false);
-    const [recipe, setRecipe] = useState<Recipe | undefined>(null);
     const [categories, setCategories] = useState<ListingCategory[]>(null);
     const [selectedMenuItems, setSelectedMenuItems] = useState<string[]>(null);
     const [openCategories, setOpenCategories] = useState<string[]>(null);
@@ -31,10 +29,10 @@ const Home = () => {
 
             setCategories(categories);
 
-            if (cookbookState.selectedRecipeId)
+            if (cookbookState.selectedListingRecipeId)
             {
-                setSelectedMenuItems([cookbookState.selectedRecipeId]);
-                const openItem = categories.find(x => x.recipes.find(y => y.recipeId == cookbookState.selectedRecipeId));
+                setSelectedMenuItems([cookbookState.selectedListingRecipeId]);
+                const openItem = categories.find(x => x.recipes.find(y => y.recipeId == cookbookState.selectedListingRecipeId));
                 setOpenCategories([openItem.order.toString()])
             };
         } catch(e)
@@ -52,20 +50,20 @@ const Home = () => {
     }, []);
 
     const getRecipe = useCallback(async () => {
-        return await GetDbRecipe(cookbookState.selectedRecipeId);
-    },[cookbookState.selectedRecipeId]);
+        return await GetDbRecipe(cookbookState.selectedListingRecipeId);
+    },[cookbookState.selectedListingRecipeId]);
 
     useEffect(() => {
-        if (!cookbookState.selectedRecipeId)
+        if (!cookbookState.selectedListingRecipeId)
             return;
 
         setRecipeLoading(true);
         getRecipe().then((value) => {
-            setRecipe(value);
+            cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_RECIPE, payload: value})
             setRecipeLoading(false);
         });
 
-    }, [cookbookState.selectedRecipeId]);
+    }, [cookbookState.selectedListingRecipeId]);
 
     const handleOpenChange = (openItems:string[]) => {
         setOpenCategories(openItems);
@@ -111,11 +109,11 @@ const Home = () => {
                             </Sider>
                             <Content>
                                 <div>
-                                    {!!recipe
+                                    {!!cookbookState.selectedRecipe
                                         ?
-                                            (<RecipeSection recipe={recipe} loading={recipeLoading} />)
+                                            (<RecipeSection recipe={cookbookState.selectedRecipe} loading={recipeLoading} />)
                                         :
-                                            <h2>{recipe?.name ?? "Select A Recipe"}</h2>
+                                            <h2>{cookbookState.selectedRecipe?.name ?? "Select A Recipe"}</h2>
                                     }
                                 </div>
                             </Content>

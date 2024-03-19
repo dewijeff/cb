@@ -14,10 +14,8 @@ const initialRecipe: Recipe = {
     ingredientGroups: [
         {
             name: null,
-            order: null,
             recipeIngredients: [
                 {
-                    order: null,
                     ingredientId: null,
                     amount: null,
                     unit: null,
@@ -30,10 +28,8 @@ const initialRecipe: Recipe = {
     stepGroups: [
         {
             name: null,
-            order: null,
             steps: [
                 {
-                    order: null,
                     title: null,
                     instructions: null,
                     imagePath: null
@@ -49,7 +45,7 @@ interface Props {
     recipeId?: string;
 };
 
-const EditRecipeModal = ({ isOpen, handleClose, recipeId }: Props) => {
+const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
     const [ingredients, setIngredients] = useState([{}]);
     const [categories, setCategories] = useState([{}]);
     const [recipe, setRecipe] = useState<Recipe>(null);
@@ -69,22 +65,27 @@ const EditRecipeModal = ({ isOpen, handleClose, recipeId }: Props) => {
 
     const onFinish = async () => {
         setWorking(true);
-        console.log('formdata', form.getFieldsValue());
-        var recipe = form.getFieldsValue();
-        recipe.id = recipeId;
-        
-        if (!recipeId)
-        {
-            const recipeResult = await AddDbRecipe(recipe);
-            cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID, payload: recipeResult.id });
-        } else {
-            await EditDbRecipe(recipe);
-        }
+        try{
+            console.log('formdata', form.getFieldsValue());
+            var recipe = form.getFieldsValue();
+            recipe.id = recipeId;
 
-        setWorking(false);
-        handleClose();
-        form.resetFields();
-        form.setFieldsValue(initialRecipe);
+            if (!recipeId)
+            {
+                const recipeResult = await AddDbRecipe(recipe);
+                cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID, payload: recipeResult.id });
+            } else {
+                const recipeResult = await EditDbRecipe(recipe);
+                cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_RECIPE, payload: recipeResult});
+            }
+        } catch (e) {
+            console.log("error saving form");
+        } finally {
+            setWorking(false);
+            handleClose();
+            form.resetFields();
+            form.setFieldsValue(initialRecipe);
+        }
     };
 
     const onFinishFailed = (errorinfo: any) => {
@@ -289,4 +290,4 @@ const EditRecipeModal = ({ isOpen, handleClose, recipeId }: Props) => {
     );
 };
 
-export default EditRecipeModal;
+export default EditRecipe;

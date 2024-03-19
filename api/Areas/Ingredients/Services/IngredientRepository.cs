@@ -10,7 +10,6 @@ public class IngredientRepository : IIngredientRepository
 {
     public async Task<IEnumerable<Ingredient>?> GetIngredients(IEnumerable<string> ingredientIds, CancellationToken cancellationToken)
     {
-        // TODO: @JXD - might be more efficient to just pull all of them and use what you need vs. doing the Filter.In - not sure.
         var collection = MongoUtility.GetCollection<Ingredient>();
 
         var objectIds = ingredientIds.EmptyIfNull().Select(ObjectId.Parse);
@@ -43,8 +42,7 @@ public class IngredientRepository : IIngredientRepository
     {
         var collection = MongoUtility.GetCollection<Ingredient>();
 
-        var filter = Builders<Ingredient>.Filter.Eq(x => x.Id, ingredient.Id);
-        // TODO: DO I really want to do a replace (I think so?) vs updating or some kind of merge?
+        var filter = Builders<Ingredient>.Filter.Eq("_id", ObjectId.Parse(ingredient.Id));
         var results = await collection.ReplaceOneAsync(filter, ingredient, new ReplaceOptions(), cancellationToken);
 
         return results.ModifiedCount;

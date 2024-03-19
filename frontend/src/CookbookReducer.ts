@@ -1,18 +1,22 @@
 import { createContext } from 'react';
+import { Recipe } from './models';
 
 export const CookbookStateContext = createContext(null);
 export const CookbookDispatchContext = createContext(null);
 
 export type CookbookState = {
-    selectedRecipeId?: string;
+    selectedListingRecipeId?: string;
+    selectedRecipe: Recipe;
 };
 
 export const cookbookInitialState: CookbookState = {
-    selectedRecipeId: null,
+    selectedListingRecipeId: null,
+    selectedRecipe: null,
 };
 
 export const enum REDUCER_ACTION_TYPE {
-    SET_SELECTED_RECIPE_ID
+    SET_SELECTED_RECIPE_ID,
+    SET_RECIPE,
 };
 
 type ReducerAction = {
@@ -26,7 +30,14 @@ export const CookbookReducer = (state: CookbookState, action: ReducerAction) => 
             // split this out to make typescript happy.
             const cookbookState : CookbookState = {
                 ...state,
-                selectedRecipeId: action.payload,
+                selectedListingRecipeId: action.payload,
+            }
+            return cookbookState;
+        }
+        case REDUCER_ACTION_TYPE.SET_RECIPE: {
+            const cookbookState : CookbookState = {
+                ...state,
+                selectedRecipe: action.payload,
             }
             return cookbookState;
         }

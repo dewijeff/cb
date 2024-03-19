@@ -37,9 +37,9 @@ const RecipeSection = ({recipe, loading}: Props) => {
                         </div>
                     </div>
                     <div className="ingredients-container">
-                        {recipe.ingredientGroups?.sort((a, b) => a.order - b.order).map(x => IngredientGroupSection(x))}
+                        {recipe.ingredientGroups?.map(x => IngredientGroupSection(x))}
                     </div>
-                    {recipe.stepGroups?.sort((a, b) => a.order - b.order).map(x => InstructionGroupSection(x))}
+                    {recipe.stepGroups?.map(x => InstructionGroupSection(x))}
                 </div>
             }
         </Spin>

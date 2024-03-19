@@ -29,30 +29,19 @@ public class RecipeDomainService : IRecipeDomainService
         if (recipe == null)
             return null;
 
-        var allIngredients =
-            recipe.IngredientGroups.SelectMany(x => x.RecipeIngredients.EmptyIfNull().Select(y => y.IngredientId)).EmptyIfNull().ToHashSet();
+        var fullRecipe = await AddIngredientDataToRecipeIngredients(recipe, cancellationToken);
 
-        if (allIngredients?.Any() == true)
-        {
-            var ingredients = (await _ingredientRepository.GetIngredients(allIngredients.EmptyIfNull(), cancellationToken)).EmptyIfNull().Where(x => x.Id != null).ToDictionary(x => x.Id!);
-            foreach (var ingredientGroup in recipe.IngredientGroups)
-            {
-                foreach (var recipeIngredient in ingredientGroup.RecipeIngredients)
-                {
-                    recipeIngredient.Ingredient = ingredients.TryGetValue(recipeIngredient.IngredientId, out var ingredient) ? ingredient : null;
-                }
-            }
-        }
-
-        return recipe;
+        return fullRecipe;
     }
 
     public async Task<Recipe?> AddRecipe(Recipe recipe, CancellationToken cancellationToken)
     {
         var result = await _recipeRepository.AddRecipe(recipe, cancellationToken);
 
+        if (result == null) return null;
+
         // Add the recipe to the category associated with it.
-        if (result?.CategoryId != null)
+        if (result.CategoryId != null)
         {
             // move this to a category domain service method to add recipe to category, and another method to remove recipe from category on delete.  This is a category function, not a recipe function.
 
@@ -66,12 +55,16 @@ public class RecipeDomainService : IRecipeDomainService
             }
         }
 
-        return result;
+        var fullRecipe = await AddIngredientDataToRecipeIngredients(result, cancellationToken);
+
+        return fullRecipe;
     }
 
-    public async Task<long> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
+    public async Task<Recipe?> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken)
     {
         var result = await _recipeRepository.UpdateRecipe(id, recipe, cancellationToken);
+
+        if (result == null) return null;
 
         var categories = (await _categoryRepository.GetCategories(cancellationToken)).ToList();
         var recipesDictionary = categories
@@ -99,7 +92,9 @@ public class RecipeDomainService : IRecipeDomainService
             await _categoryRepository.EditCategory(newCategory, cancellationToken);
         }
 
-        return result;
+        var fullRecipe = await AddIngredientDataToRecipeIngredients(result, cancellationToken);
+
+        return fullRecipe;
     }
 
     public async Task<bool> DeleteRecipe(string id, CancellationToken cancellationToken)
@@ -107,5 +102,25 @@ public class RecipeDomainService : IRecipeDomainService
         throw new NotImplementedException();
 
         // make sure to remove it from the category also.
+    }
+
+    private async Task<Recipe> AddIngredientDataToRecipeIngredients(Recipe recipe, CancellationToken cancellationToken)
+    {
+        var allIngredients =
+            recipe.IngredientGroups.SelectMany(x => x.RecipeIngredients.EmptyIfNull().Select(y => y.IngredientId)).EmptyIfNull().ToHashSet();
+
+        if (allIngredients.Any())
+        {
+            var ingredients = (await _ingredientRepository.GetIngredients(allIngredients.EmptyIfNull(), cancellationToken)).EmptyIfNull().Where(x => x.Id != null).ToDictionary(x => x.Id!);
+            foreach (var ingredientGroup in recipe.IngredientGroups)
+            {
+                foreach (var recipeIngredient in ingredientGroup.RecipeIngredients)
+                {
+                    recipeIngredient.Ingredient = ingredients.TryGetValue(recipeIngredient.IngredientId, out var ingredient) ? ingredient : null;
+                }
+            }
+        }
+
+        return recipe;
     }
 }

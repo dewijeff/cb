@@ -32,7 +32,7 @@ export const GetDbRecipe = async (recipeId: string) => {
         return null;
 
     const recipe: Recipe = await response.json();
-    return recipe;
+    return Promise.resolve(recipe);
 }
 
 export const AddDbRecipe = async (recipe: Recipe) => {
@@ -48,7 +48,8 @@ export const AddDbRecipe = async (recipe: Recipe) => {
 
     if (!response.ok)
     {
-        throw Error("Error Adding Recipe");
+        throw new Error("ErrorAddingRecipe");
+        // Promise.reject("Error Adding Recipe")
     }
 
     const recipeResponse: Recipe = await response.json();
@@ -66,13 +67,14 @@ export const EditDbRecipe = async (recipe: Recipe) => {
         body: JSON.stringify(recipe),
     });
 
-
     if (!response.ok)
     {
-        throw Error("Error Editing Recipe");
+        throw new Error("Error Editing Recipe");
+        // Promise.reject("Error Editing Recipe");
     }
 
-    return response;
+    const recipeResponse: Recipe = await response.json();
+    return recipeResponse;
 };
 
 export const DeleteDbRecipe = async (recipeId: string) => {
@@ -81,7 +83,6 @@ export const DeleteDbRecipe = async (recipeId: string) => {
         method: 'DELETE',
     });
 
-    
     if (!response.ok)
     {
         throw Error("Error Deleting Recipe");

@@ -9,8 +9,6 @@ namespace api.Areas.Recipes.Models;
 [BsonNoId]
 public class RecipeIngredient
 {
-    [BsonElement("order")]
-    public int Order { get; set; }
 
     [BsonElement("ingredients_id"), BsonRepresentation(BsonType.ObjectId)]
     public string IngredientId { get; set; } = string.Empty;

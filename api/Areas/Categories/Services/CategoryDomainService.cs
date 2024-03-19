@@ -1,21 +1,40 @@
 ﻿using api.Areas.Categories.Models;
+using api.Areas.Recipes.Services;
 
 namespace api.Areas.Categories.Services;
 
-public class CategoryDomainService : ICategoryDomainService
+public sealed class CategoryDomainService : ICategoryDomainService
 {
-    public ListingCategory AddCategory(ListingCategory category, CancellationToken cancellationToken)
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IRecipeRepository _recipeRepository;
+
+    public CategoryDomainService(
+        ICategoryRepository categoryRepository,
+        IRecipeRepository recipeRepository)
+    {
+        _categoryRepository = categoryRepository;
+        _recipeRepository = recipeRepository;
+    }
+
+    public Task<ListingCategory> AddCategory(ListingCategory category, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public ListingCategory EditCategory(ListingCategory category, CancellationToken cancellationToken)
+    public Task<ListingCategory> EditCategory(ListingCategory category, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public bool DeleteCategory(string id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteCategory(string id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var recipeCountForCategory = await _recipeRepository.GetCategoryRecipeCount(id, cancellationToken);
+
+        if (recipeCountForCategory > 0)
+            return false;
+
+        var result =  await _categoryRepository.DeleteCategory(id, cancellationToken);
+
+        return result;
     }
 }
