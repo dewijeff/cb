@@ -1,22 +1,31 @@
 import { createContext } from 'react';
-import { Recipe } from './models';
+import { Ingredient, Recipe } from './models';
 
 export const CookbookStateContext = createContext(null);
 export const CookbookDispatchContext = createContext(null);
 
 export type CookbookState = {
     selectedListingRecipeId?: string;
-    selectedRecipe: Recipe;
+    selectedRecipe?: Recipe;
+    ingredients?: Ingredient[];
+    editIngredientsOpen: boolean;
+    allowEdit: boolean;
 };
 
 export const cookbookInitialState: CookbookState = {
     selectedListingRecipeId: null,
     selectedRecipe: null,
+    ingredients: null,
+    editIngredientsOpen: false,
+    allowEdit: false,
 };
 
 export const enum REDUCER_ACTION_TYPE {
     SET_SELECTED_RECIPE_ID,
     SET_RECIPE,
+    INGREDIENTS_UPDATED,
+    EDIT_INGREDIENT_OPEN,
+    ALLOW_EDIT,
 };
 
 type ReducerAction = {
@@ -31,14 +40,35 @@ export const CookbookReducer = (state: CookbookState, action: ReducerAction) => 
             const cookbookState : CookbookState = {
                 ...state,
                 selectedListingRecipeId: action.payload,
-            }
+            };
             return cookbookState;
         }
         case REDUCER_ACTION_TYPE.SET_RECIPE: {
             const cookbookState : CookbookState = {
                 ...state,
                 selectedRecipe: action.payload,
-            }
+            };
+            return cookbookState;
+        }
+        case REDUCER_ACTION_TYPE.INGREDIENTS_UPDATED: {
+            const cookbookState : CookbookState = {
+                ...state,
+                ingredients: action.payload,
+            };
+            return cookbookState;
+        }
+        case REDUCER_ACTION_TYPE.EDIT_INGREDIENT_OPEN: {
+            const cookbookState : CookbookState = {
+                ...state,
+                editIngredientsOpen: action.payload
+            };
+            return cookbookState;
+        }
+        case REDUCER_ACTION_TYPE.ALLOW_EDIT: {
+            const cookbookState : CookbookState = {
+                ...state,
+                allowEdit: action.payload
+            };
             return cookbookState;
         }
         default: {

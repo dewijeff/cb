@@ -1,9 +1,10 @@
 import { Header } from "antd/lib/layout/layout";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import './index.css';
 import { Button, Space } from "antd";
 import EditIngredient from "../EditIngredient";
 import EditRecipe from "../EditRecipe";
+import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
 
 interface Props {
     cookbookName: string;
@@ -11,14 +12,16 @@ interface Props {
 
 const CookbookHeader = ({cookbookName} : Props) => {
     const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false);
-    const [isAddIngredientOpen, setIsAddIngredientOpen] = useState(false);
+
+    const cookbookState: CookbookState = useContext(CookbookStateContext);
+    const cookbookDispatch = useContext(CookbookDispatchContext);
 
     const handleCloseRecipeModal = () => {
         setIsAddRecipeOpen(false);
     };
 
-    const handleCloseIngredientModal = () => {
-        setIsAddIngredientOpen(false);
+    const handleIngredientModal = (isOpen: boolean) => {
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_INGREDIENT_OPEN, payload: isOpen});
     };
 
     return(
@@ -38,9 +41,9 @@ const CookbookHeader = ({cookbookName} : Props) => {
                 <div className='headerRight'>
                     <Space direction='horizontal'>
                         <Button onClick={() => setIsAddRecipeOpen(true)}>Add Recipe</Button>
-                        <Button onClick={() => setIsAddIngredientOpen(true)}>Add Ingredient</Button>
+                        <Button onClick={() => handleIngredientModal(true)}>Add Ingredient</Button>
                         <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal}/>
-                        <EditIngredient isOpen={isAddIngredientOpen} handleClose={handleCloseIngredientModal} />
+                        <EditIngredient isOpen={cookbookState.editIngredientsOpen} handleClose={() => handleIngredientModal(false)} />
                     </Space>
                 </div>
             </div>

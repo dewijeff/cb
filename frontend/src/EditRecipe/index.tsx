@@ -4,7 +4,7 @@ import { Button, Drawer, Form, Input, InputNumber, Select, Space, Spin, notifica
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from "antd/lib/input/TextArea";
 import { AddDbRecipe, EditDbRecipe, GetDbCategories, GetDbIngredients, GetDbRecipe } from "../network";
-import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
+import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
 
 // initial recipe has no 
 const initialRecipe: Recipe = {
@@ -46,7 +46,7 @@ interface Props {
 };
 
 const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
-    const [ingredients, setIngredients] = useState([{}]);
+    // const [ingredients, setIngredients] = useState([{}]);
     const [categories, setCategories] = useState([{}]);
     const [recipe, setRecipe] = useState<Recipe>(null);
     const [measurementUnits, setMeasurementUnits] = useState([{}]);
@@ -54,6 +54,7 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
     const [working, setWorking] = useState(false);
     const [initialLoad, setInitialLoad] = useState(true);
     const cookbookDispatch = useContext(CookbookDispatchContext);
+    const cookbookState: CookbookState = useContext(CookbookStateContext);
 
     const [form] = Form.useForm<Recipe>();
 
@@ -63,29 +64,31 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
         handleClose();
     };
 
+    const handleAddIngredient = () => {
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_INGREDIENT_OPEN, payload: true });
+
+
+    }
+
     const onFinish = async () => {
         setWorking(true);
-        try{
-            console.log('formdata', form.getFieldsValue());
-            var recipe = form.getFieldsValue();
-            recipe.id = recipeId;
+        console.log('formdata', form.getFieldsValue());
+        var recipe = form.getFieldsValue();
+        recipe.id = recipeId;
 
-            if (!recipeId)
-            {
-                const recipeResult = await AddDbRecipe(recipe);
-                cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID, payload: recipeResult.id });
-            } else {
-                const recipeResult = await EditDbRecipe(recipe);
-                cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_RECIPE, payload: recipeResult});
-            }
-        } catch (e) {
-            console.log("error saving form");
-        } finally {
-            setWorking(false);
-            handleClose();
-            form.resetFields();
-            form.setFieldsValue(initialRecipe);
+        if (!recipeId)
+        {
+            const recipeResult = await AddDbRecipe(recipe);
+            cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID, payload: recipeResult.id });
+        } else {
+            const recipeResult = await EditDbRecipe(recipe);
+            cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_RECIPE, payload: recipeResult});
         }
+
+        setWorking(false);
+        handleClose();
+        form.resetFields();
+        form.setFieldsValue(initialRecipe);
     };
 
     const onFinishFailed = (errorinfo: any) => {
@@ -95,6 +98,9 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
             description: 'There was an error saving. Please try again later.',
         });
         setWorking(false);
+        handleClose();
+        form.resetFields();
+        form.setFieldsValue(initialRecipe);
     };
 
     useEffect(() => {
@@ -108,15 +114,15 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
             .then(setRecipe);
         }
         setLoading(false);
-    }
-    , [isOpen]);
+    }, [isOpen]);
 
     useEffect(() => {
         setLoading(true);
 
+        // TODO: How to get this dataloading and updating somewhere useful.  maybe this can be done with react-query and cache invalidation?
         GetDbIngredients()
         .then((ingredients) => ingredients.map((ingredient) => ({value: ingredient.id, label: ingredient.name})))
-        .then(setIngredients);
+        .then((ingredients) => {cookbookDispatch({type: REDUCER_ACTION_TYPE.INGREDIENTS_UPDATED, payload: ingredients})});
 
         GetDbCategories()
         .then((categories) => categories.map((category) => ({value: category.id, label: category.name})))
@@ -143,8 +149,6 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
         setInitialLoad(false);
     }, []);
 
-
-
     const showSpin = loading || working;
 
     console.log(recipe);
@@ -156,6 +160,7 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
             open={isOpen}
             onClose={handleCancel} extra={
             <Space>
+                <Button onClick={handleAddIngredient}>Add Ingredient</Button>
                 <Button onClick={handleCancel}>Cancel</Button>
                 <Button onClick={() => form.submit()} type="primary" htmlType="submit">
                     Save
@@ -208,7 +213,7 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
                                                                     {recipeIngredients.map((ingredientField) => (
                                                                         <Space direction="horizontal" key={ingredientField.key}>
                                                                             <Form.Item name={[ingredientField.name, 'ingredientId']} rules={[{required: true, message:"required"}]}>
-                                                                                <Select placeholder="Select an ingredient" options={ingredients}/>
+                                                                                <Select placeholder="Select an ingredient" options={cookbookState.ingredients}/>
                                                                             </Form.Item>
                                                                             <Form.Item name={[ingredientField.name, 'amount']} rules={[{required: true, message:"required"}]}>
                                                                                 <InputNumber/>

@@ -1,25 +1,42 @@
-import { Form, Space, Input, Checkbox, Modal, notification, Spin } from "antd";
-import React, { useState } from "react";
+import { Form, Space, Input, Checkbox, Modal, notification, Spin, message } from "antd";
+import React, { useContext, useState } from "react";
 import { Ingredient } from "../models";
-import { AddDbIngredient } from "../network";
+import { AddDbIngredient, GetDbIngredients } from "../network";
+import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
 
 interface Props {
     isOpen: boolean;
     handleClose: () => void;
 };
 
-const AddIngredient = ({isOpen, handleClose}: Props) => {
+const EditIngredient = ({isOpen, handleClose}: Props) => {
     const [working, setWorking] = useState(false);
-
+    const cookbookDispatch = useContext(CookbookDispatchContext)
+    
     const [form] = Form.useForm<Ingredient>();
 
     const onFinish = async () => {
         setWorking(true);
         const ingredient = form.getFieldsValue();
 
-        await AddDbIngredient(ingredient);
-        console.log('onfinish', ingredient);
-        setWorking(false);
+        try{
+            await AddDbIngredient(ingredient);
+
+            // update ingredients
+            GetDbIngredients()
+                .then((ingredients) => ingredients.map((ingredient) => ({value: ingredient.id, label: ingredient.name})))
+                .then((ingredients) => {cookbookDispatch({type: REDUCER_ACTION_TYPE.INGREDIENTS_UPDATED, payload: ingredients})});
+        } 
+        catch (ex)
+        {
+            message.error(ex.message);
+        } 
+        finally 
+        {
+            setWorking(false);
+        }
+
+        form.resetFields();
         handleClose();
     }
 
@@ -59,4 +76,4 @@ const AddIngredient = ({isOpen, handleClose}: Props) => {
     );
 };
 
-export default AddIngredient;
+export default EditIngredient;
