@@ -1,11 +1,14 @@
-﻿using api.Areas.Categories.Models;
+﻿using api.Areas.Auth.Models;
+using api.Areas.Categories.Models;
 using api.Areas.Categories.Services;
 using api.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace api.Areas.Categories;
 
+[Authorize]
 [ApiController]
 [Route("cookbook")]
 public class CategoriesController : Controller
@@ -30,6 +33,8 @@ public class CategoriesController : Controller
         return Json(categories, _jsonSettings);
     }
 
+
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpPost]
     [Route("categories")]
     public async Task<IActionResult> AddCategory([FromBody] ListingCategory category,
@@ -40,6 +45,7 @@ public class CategoriesController : Controller
         return Json(response, _jsonSettings);
     }
 
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpDelete]
     [Route("categories/{id}")]
     public async Task<IActionResult> DeleteCategory(string id, CancellationToken cancellationToken)

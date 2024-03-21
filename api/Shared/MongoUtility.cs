@@ -1,4 +1,5 @@
-﻿using api.Areas.Categories.Models;
+﻿using api.Areas.Auth.Models;
+using api.Areas.Categories.Models;
 using api.Areas.Ingredients.Models;
 using api.Areas.Recipes.Models;
 using MongoDB.Driver;
@@ -31,6 +32,8 @@ public static class MongoUtility
             return "recipes";
         if (typeof(T) == typeof(ListingCategory))
             return "categories";
+        if (typeof(T) == typeof(User))
+            return "users";
 
         throw new InvalidOperationException("Unknown collection for Type");
     }
