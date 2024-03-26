@@ -2,6 +2,7 @@
 using api.Areas.Auth.Models;
 using api.Areas.Auth.Services;
 using api.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -73,9 +74,21 @@ public class AuthController : Controller
         //    HttpOnly = true
         //});
 
-        return Json(jwt);
+        return Json(new
+        {
+            Jwt = jwt
+        });
     }
 
+    [HttpGet]
+    [Route("verify")]
+    [Authorize]
+    public IActionResult VerifyToken()
+    {
+        return Ok();
+    }
+
+    // TODO:? - leftover from an early poc
     [HttpGet]
     [Route("user")]
     public async Task<IActionResult> User(CancellationToken cancellationToken)
@@ -96,6 +109,7 @@ public class AuthController : Controller
         }
     }
 
+    // TODO:? - leftover from an early poc
     [HttpPost]
     [Route("logout")]
     public IActionResult Logout(CancellationToken cancellationToken)

@@ -38,14 +38,16 @@ const CookbookHeader = ({cookbookName} : Props) => {
                         <h1 className='cookbookTitle'>{cookbookName} Cookbook </h1>
                     </a>
                 </div>
-                <div className='headerRight'>
-                    <Space direction='horizontal'>
-                        <Button onClick={() => setIsAddRecipeOpen(true)}>Add Recipe</Button>
-                        <Button onClick={() => handleIngredientModal(true)}>Add Ingredient</Button>
-                        <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal}/>
-                        <EditIngredient isOpen={cookbookState.editIngredientsOpen} handleClose={() => handleIngredientModal(false)} />
-                    </Space>
-                </div>
+                {cookbookState.allowEdit && (
+                    <div className='headerRight'>
+                        <Space direction='horizontal'>
+                            <Button onClick={() => setIsAddRecipeOpen(true)}>Add Recipe</Button>
+                            <Button onClick={() => handleIngredientModal(true)}>Add Ingredient</Button>
+                            <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal}/>
+                            <EditIngredient isOpen={cookbookState.editIngredientsOpen} handleClose={() => handleIngredientModal(false)} />
+                        </Space>
+                    </div>
+                )}
             </div>
         </Header>
     );

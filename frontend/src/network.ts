@@ -1,4 +1,5 @@
-import { Ingredient, ListingCategory, Recipe } from "./models";
+import { useContext } from "react";
+import { Ingredient, JwtTokenName, ListingCategory, Recipe, UserLogin } from "./models";
 
 const baseUrl = "https://localhost:7014"
 
@@ -10,10 +11,17 @@ const baseUrl = "https://localhost:7014"
 
 // move all network interactions here.
 
-
 // Categories
 export const GetDbCategories = async () => {
-    const response = await fetch(`${baseUrl}/cookbook/categories/`);
+    // TODO: Make this better - lots of repetitive code around authorization - has to be a way to wrap this to add the Authorization Header automatically.  Also would like to change state based on a 401 from any of these and kick the user back to the login page...
+    const jwt = localStorage.getItem(JwtTokenName);
+    const response = await fetch(`${baseUrl}/cookbook/categories/`,
+    {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${jwt}`
+        }
+    });
 
     if (!response.ok)
         return null;
@@ -22,11 +30,17 @@ export const GetDbCategories = async () => {
     return categories;
 }
 
-
 // Recipes
 export const GetDbRecipe = async (recipeId: string) => {
+    const jwt = localStorage.getItem(JwtTokenName);
     const url = `${baseUrl}/cookbook/recipes/${recipeId}`
-    const response = await fetch(url);
+    const response = await fetch(url,
+        {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            }
+        });
 
     if (!response.ok)
         return null;
@@ -37,11 +51,13 @@ export const GetDbRecipe = async (recipeId: string) => {
 
 export const AddDbRecipe = async (recipe: Recipe) => {
     // Add new recipe to db
+    const jwt = localStorage.getItem(JwtTokenName);
     const response = await fetch(`${baseUrl}/cookbook/recipes`,
     {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`,
         },
         body: JSON.stringify(recipe),
     });
@@ -58,11 +74,13 @@ export const AddDbRecipe = async (recipe: Recipe) => {
 
 export const EditDbRecipe = async (recipe: Recipe) => {
     // Replaces entire recipe with new content
+    const jwt = localStorage.getItem(JwtTokenName);
     const response = await fetch(`${baseUrl}/cookbook/recipes/${recipe.id}`,
     {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`,
         },
         body: JSON.stringify(recipe),
     });
@@ -78,9 +96,13 @@ export const EditDbRecipe = async (recipe: Recipe) => {
 };
 
 export const DeleteDbRecipe = async (recipeId: string) => {
+    const jwt = localStorage.getItem(JwtTokenName);
     const response = await fetch (`${baseUrl}/cookbook/recipes/${recipeId}`,
     {
         method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${jwt}`,
+        }
     });
 
     if (!response.ok)
@@ -93,7 +115,14 @@ export const DeleteDbRecipe = async (recipeId: string) => {
 
 // Ingredients
 export const GetDbIngredients = async () => {
-    const response = await fetch(`${baseUrl}/cookbook/ingredients/`);
+    const jwt = localStorage.getItem(JwtTokenName);
+    const response = await fetch(`${baseUrl}/cookbook/ingredients/`,
+    {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${jwt}`
+        }
+    });
 
     if (!response.ok)
         return null;
@@ -104,11 +133,13 @@ export const GetDbIngredients = async () => {
 }
 
 export const AddDbIngredient = async (ingredient: Ingredient) => {
+    const jwt = localStorage.getItem(JwtTokenName);
     const response = await fetch(`${baseUrl}/cookbook/ingredients`,
     {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`,
         },
         body: JSON.stringify(ingredient),
     });
@@ -123,11 +154,13 @@ export const AddDbIngredient = async (ingredient: Ingredient) => {
 };
 
 export const EditDbIngredient = async (ingredient: Ingredient) => {
+    const jwt = localStorage.getItem(JwtTokenName);
     const response = await fetch(`${baseUrl}/cookbook/ingredients/${ingredient.id}`,
     {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`,
         },
         body: JSON.stringify(ingredient),
     });
@@ -141,9 +174,13 @@ export const EditDbIngredient = async (ingredient: Ingredient) => {
 };
 
 export const DeleteDbIngredient = async (ingredientId: string) => {
+    const jwt = localStorage.getItem(JwtTokenName);
     const response = await fetch(`${baseUrl}/cookbook/ingredients/${ingredientId}`,
     {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${jwt}`,
+        },
     });
 
     if (!response.ok)
@@ -153,3 +190,49 @@ export const DeleteDbIngredient = async (ingredientId: string) => {
 
     return response;
 };
+
+export const RegisterUser = async () => {
+
+}
+
+interface LoginResponse {
+    jwt: string
+}
+
+export const LoginUser = async (login: UserLogin) => {
+    const response = await fetch(`${baseUrl}/cookbook/login/`,
+    {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(login),
+    });
+
+    if (response.ok)
+    {
+        const responseJson: LoginResponse = await response.json();
+
+        localStorage.setItem(JwtTokenName, responseJson.jwt);
+    }
+
+    return response.statusText;
+}
+
+export const VerifyAuth = async () => {
+    const jwt = localStorage.getItem(JwtTokenName);
+    const response = await fetch(`${baseUrl}/cookbook/verify/`,
+    {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${jwt}`
+        }
+    });
+
+    if (!response.ok)
+    {
+        return false;
+    }
+
+    return true;
+}

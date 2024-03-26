@@ -1,4 +1,5 @@
 export const CookbookName = "jeff's";
+export const JwtTokenName = 'CookbookToken';
 
 export enum MeasurementUnit {
     Cup = 1,
@@ -85,3 +86,8 @@ export type ListingCategory = {
 //     name: string;
 //     recipes: Recipe[];
 // };
+
+export type UserLogin = {
+    email: string;
+    password: string;
+}
