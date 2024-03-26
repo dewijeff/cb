@@ -2,12 +2,10 @@ import React, { useReducer } from "react";
 import { createRoot } from 'react-dom/client';
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./Home";
-import EditRecipe from "./EditRecipe";
-import EditIngredient from "./EditIngredient";
 import { CookbookDispatchContext, CookbookStateContext, cookbookInitialState, CookbookReducer, } from "./CookbookReducer";
 import About from "./About";
-
-// Edit will be the same component as add, just with an ?id={id} on the end. - not sure how to really do that.
+import Login from "./Login";
+import Register from "./Register";
 
 const App = () => {
   const [state, dispatch] = useReducer(CookbookReducer, cookbookInitialState);
@@ -17,8 +15,11 @@ const App = () => {
       <CookbookDispatchContext.Provider value={dispatch}>
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Login switchUser={false}/>} />
+            <Route path="/cookbook" element={<Home />} />
             <Route path="/about" element={<About/>} />
+            <Route path="/register" element={<Register/>} />
+            <Route path="/switchUser" element={<Login switchUser={true}/>} />
           </Routes>
         </Router>
       </CookbookDispatchContext.Provider>

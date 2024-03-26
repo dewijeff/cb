@@ -1,11 +1,14 @@
-﻿using api.Areas.Ingredients.Models;
+﻿using api.Areas.Auth.Models;
+using api.Areas.Ingredients.Models;
 using api.Areas.Ingredients.Services;
 using api.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace api.Areas.Ingredients;
 
+[Authorize]
 [ApiController]
 [Route("cookbook")]
 public class IngredientsController : Controller
@@ -31,6 +34,7 @@ public class IngredientsController : Controller
         return Json(ingredients, _jsonSettings);
     }
 
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpPost]
     [Route("ingredients")]
     public async Task<IActionResult> AddIngredient([FromBody] Ingredient ingredient, CancellationToken cancellationToken)
@@ -40,6 +44,7 @@ public class IngredientsController : Controller
         return Json(result, _jsonSettings);
     }
 
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpPut]
     [Route("ingredients")]
     public async Task<IActionResult> EditIngredient([FromBody]Ingredient ingredient,
@@ -53,6 +58,7 @@ public class IngredientsController : Controller
         return NotFound(); // TODO: @JXD - This isn't necessarily 100% accurate, but if it doesn't blow up and it wasn't deleted, this is the likely cause...
     }
 
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpDelete]
     [Route("ingredients/{id}")]
     public async Task<IActionResult> DeleteIngredient(string id, CancellationToken cancellationToken)

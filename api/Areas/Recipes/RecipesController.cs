@@ -1,6 +1,7 @@
 ﻿using api.Areas.Recipes.Models;
 using api.Areas.Recipes.Services;
 using api.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -27,6 +28,7 @@ public class RecipesController : Controller
         return Json(recipe, _jsonSettings);
     }
 
+    [Authorize]
     [HttpPost]
     [Route("recipes")]
     public async Task<IActionResult> AddRecipe([FromBody] Recipe request, CancellationToken cancellationToken)
@@ -36,6 +38,7 @@ public class RecipesController : Controller
         return Json(recipe, _jsonSettings);
     }
 
+    [Authorize]
     [HttpPut]
     [Route("recipes/{id}")]
     public async Task<IActionResult> UpdateRecipe(string id, [FromBody] Recipe request, CancellationToken cancellationToken)
@@ -45,6 +48,7 @@ public class RecipesController : Controller
         return Json(recipe, _jsonSettings);
     }
 
+    [Authorize]
     [HttpDelete]
     [Route("recipes")]
     public async Task<IActionResult> DeleteRecipe([FromQuery] string id, CancellationToken cancellationToken)

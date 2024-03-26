@@ -3,12 +3,18 @@ import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
 import { Layout, Menu, Spin } from 'antd'
-import { ListingCategory, CookbookName } from '../models';
+import { ListingCategory, CookbookName, JwtTokenName } from '../models';
 import RecipeSection from './RecipeSection';
 import CookbookHeader from '../CookbookHeader';
 import { GetDbCategories, GetDbRecipe } from '../network';
 import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../CookbookReducer';
+import { jwtDecode } from 'jwt-decode';
 const { Content, Sider } = Layout;
+
+interface JwtValues {
+    canEdit: boolean;
+    email: string;
+}
 
 const Home = () => {
     const [contentsLoading, setContentsLoading] = useState(true);
@@ -47,6 +53,16 @@ const Home = () => {
 
     useEffect(() => {
         handleLoad();
+
+        const jwt = localStorage.getItem(JwtTokenName);
+        const decoded : JwtValues = jwtDecode(jwt);
+        console.log(decoded);
+
+        const allowEdit = decoded.canEdit; // decoded.claims.something?
+
+        console.log(allowEdit);
+
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.ALLOW_EDIT, payload: allowEdit})
     }, []);
 
     const getRecipe = useCallback(async () => {

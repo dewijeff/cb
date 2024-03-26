@@ -62,12 +62,12 @@ const EditIngredient = ({isOpen, handleClose}: Props) => {
                     onFinishFailed={onFinishFailed}>
                     <Space direction='vertical'>
                         <Space direction='horizontal'>
-                        <Form.Item label='Ingredient Name' name='name'>
-                            <Input />
-                        </Form.Item>
-                        <Form.Item label='Hide units' name='hideUnit' valuePropName='checked'>
-                            <Checkbox />
-                        </Form.Item>
+                            <Form.Item label='Ingredient Name' name='name'>
+                                <Input />
+                            </Form.Item>
+                            <Form.Item label='Hide units' name='hideUnit' valuePropName='checked'>
+                                <Checkbox />
+                            </Form.Item>
                         </Space>
                     </Space>
                 </Form>

@@ -66,8 +66,6 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
 
     const handleAddIngredient = () => {
         cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_INGREDIENT_OPEN, payload: true });
-
-
     }
 
     const onFinish = async () => {
