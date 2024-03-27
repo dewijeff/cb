@@ -8,6 +8,8 @@ public interface IRecipeRepository
 
     Task<long> GetCategoryRecipeCount(string categoryId, CancellationToken cancellationToken);
 
+    Task<IEnumerable<Recipe>> GetRecipesUsingIngredient(string ingredientId, CancellationToken cancellationToken);
+
     Task<Recipe?> AddRecipe(Recipe recipe, CancellationToken cancellationToken);
 
     Task<Recipe?> UpdateRecipe(string id, Recipe recipe, CancellationToken cancellationToken);

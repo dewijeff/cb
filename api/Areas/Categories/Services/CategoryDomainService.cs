@@ -28,7 +28,7 @@ public sealed class CategoryDomainService : ICategoryDomainService
 
     public async Task<bool> DeleteCategory(string id, CancellationToken cancellationToken)
     {
-        var recipeCountForCategory = await _recipeRepository.GetCategoryRecipeCount(id, cancellationToken);
+        var recipeCountForCategory = await _recipeRepository.GetCategoryRecipeCount(id, cancellationToken); // can just check the category children too... there will be no way to fix this.
 
         if (recipeCountForCategory > 0)
             return false;

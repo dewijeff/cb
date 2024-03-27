@@ -68,6 +68,6 @@ public class IngredientsController : Controller
         if (result)
             return Ok();
 
-        return NotFound();
+        return NotFound(); // Alternatively - this could be a bad request if the ingredient is being used.
     }
 }

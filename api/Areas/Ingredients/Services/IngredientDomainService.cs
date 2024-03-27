@@ -1,14 +1,19 @@
 ﻿using api.Areas.Ingredients.Models;
+using api.Areas.Recipes.Services;
 
 namespace api.Areas.Ingredients.Services;
 
 public class IngredientDomainService : IIngredientDomainService
 {
     private readonly IIngredientRepository _ingredientRepository;
+    private readonly IRecipeRepository _recipeRepository;
 
-    public IngredientDomainService(IIngredientRepository ingredientRepository)
+    public IngredientDomainService(
+        IIngredientRepository ingredientRepository,
+        IRecipeRepository recipeRepository)
     {
         _ingredientRepository = ingredientRepository;
+        _recipeRepository = recipeRepository;
     }
 
     public async Task<Ingredient> AddIngredient(Ingredient ingredient, CancellationToken cancellationToken)
@@ -36,6 +41,11 @@ public class IngredientDomainService : IIngredientDomainService
 
     public async Task<bool> DeleteIngredient(string id, CancellationToken cancellationToken)
     {
+        // Verify the ingredient can be deleted - it must not be being used by any recipe
+        var recipesUsingIngredient = await _recipeRepository.GetRecipesUsingIngredient(id, cancellationToken);
+        if (recipesUsingIngredient.Any())
+            return false;
+
         return await _ingredientRepository.DeleteIngredient(id, cancellationToken);
     }
 }

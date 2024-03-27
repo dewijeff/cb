@@ -16,7 +16,7 @@ interface Props {
 }
 
 const Login = ({switchUser}: Props) => {
-    const [showSpin, setShowSpin] = useState(false);
+    const [showSpin, setShowSpin] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string>(null);
     const cookbookDispatch = useContext(CookbookDispatchContext);
     
@@ -24,8 +24,18 @@ const Login = ({switchUser}: Props) => {
 
     const navigate = useNavigate();
 
-    const checkAuth = async () => {
-        return await VerifyAuth();
+    const checkAuth = async (token: string) => {
+        const authVerified = await VerifyAuth();
+
+        if (authVerified)
+        {
+            // user is authorized still - send them to home
+            cookbookDispatch({type: REDUCER_ACTION_TYPE.AUTHENTICATED, payload: true });
+            handleClaims(token);
+            navigate('/cookbook/');
+        }
+        setShowSpin(false);
+        // user is not authorized - make them log in
     }
 
     useEffect(()  => {
@@ -36,14 +46,7 @@ const Login = ({switchUser}: Props) => {
         const localToken = localStorage.getItem(JwtTokenName);
         if (localToken)
         {
-            // user is authorized still - send them to home
-            if (checkAuth)
-            {
-                cookbookDispatch({type: REDUCER_ACTION_TYPE.AUTHENTICATED, payload: true });
-                handleClaims(localToken);
-                navigate('/cookbook/');
-            }
-            // user is not authorized - make them log in
+            checkAuth(localToken);
         }
     }, []);
     // ALSO TODO: should this use a cookie or local storage.  local storage and append header manually seems easier to me, but http only cookie seems more secure - look into this later
@@ -83,9 +86,11 @@ const Login = ({switchUser}: Props) => {
         setShowSpin(false);
     }
 
+    // TODO: @JLD - make this pretty
     return (
         <Spin spinning={showSpin}>
-            <Form
+            {!showSpin ? (
+                <Form
                 form={form}
                 name="Login"
                 onFinish={onFinish}
@@ -101,6 +106,8 @@ const Login = ({switchUser}: Props) => {
                     {errorMessage}
                 </Space>
             </Form>
+            ) :
+            (<div>Loading</div>)}
         </Spin>
     );
 }

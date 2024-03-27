@@ -56,14 +56,12 @@ const CookbookHeader = ({cookbookName} : Props) => {
         }
     ];
 
-// TODO: @JLD - Dropdown hamburger menu really isn't a hamburger menu and won't be responsive on mobile.  will probably work though...
-
+    // TODO: @JLD - Dropdown hamburger menu really isn't a hamburger menu and won't be responsive on mobile.  will probably work though...
     return(
         <Header>
-            <div 
+            <div className='grid-container'
                 style={{
-                    padding: "auto",
-                    display: "grid"
+                    padding: "auto"
                 }}
             >
                 <div className='headerLeft'>
@@ -77,16 +75,20 @@ const CookbookHeader = ({cookbookName} : Props) => {
                     </a>
                 </div>
                 <div className='headerRight'>
-                    <Space direction='horizontal'>
-                        {cookbookState.allowEdit && (
-                            <>
-                                <Button onClick={() => setIsAddRecipeOpen(true)}>Add Recipe</Button>
-                                <Button onClick={() => handleIngredientModal(true)}>Add Ingredient</Button>
-                                <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal}/>
-                                <EditIngredient isOpen={cookbookState.editIngredientsOpen} handleClose={() => handleIngredientModal(false)} />
-                            </>
-                        )}
-                    </Space>
+                    {cookbookState.allowEdit && (
+                        <Space direction='horizontal'>
+                            {cookbookState.isEditing ? (
+                                <>
+                                    <Button onClick={() => setIsAddRecipeOpen(true)}>Add Recipe</Button>
+                                    <Button onClick={() => handleIngredientModal(true)}>Add Ingredient</Button>
+                                    <Button onClick={() => {cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_EDITING, payload: false})}}>Close Edit</Button>
+                                </>
+                            ) :
+                            (
+                                <Button onClick={() => {cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_EDITING, payload: true})}}>Edit</Button>
+                            )}
+                        </Space>
+                    )}
                 </div>
             </div>
         </Header>

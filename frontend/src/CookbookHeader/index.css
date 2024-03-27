@@ -1,6 +1,6 @@
-.headerRow {
+.grid-container {
     display: grid;
-    grid-template-columns: 25%, 50%, 25%;
+    grid-template-columns: 25% 50% 25%;
 }
 
 .headerLeft {

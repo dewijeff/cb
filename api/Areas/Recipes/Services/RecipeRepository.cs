@@ -1,5 +1,6 @@
 ﻿using api.Areas.Recipes.Models;
 using api.Shared;
+using api.Shared.Extensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -32,6 +33,17 @@ public class RecipeRepository : IRecipeRepository
         var count = await _collection.CountDocumentsAsync(filter, new CountOptions(),cancellationToken);
 
         return count;
+    }
+
+    public async Task<IEnumerable<Recipe>> GetRecipesUsingIngredient(
+        string ingredientId,
+        CancellationToken cancellationToken)
+    {
+        var filter = Builders<Recipe>.Filter.Eq("ingredientGroups.recipeIngredients.ingredients_id", ingredientId);
+
+        var recipes = await _collection.Find(filter).ToListAsync(cancellationToken);
+
+        return recipes.EmptyIfNull();
     }
 
     public async Task<Recipe?> AddRecipe(Recipe recipe, CancellationToken cancellationToken)

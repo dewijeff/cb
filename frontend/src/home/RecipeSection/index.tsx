@@ -50,7 +50,7 @@ const RecipeSection = ({recipe, loading, setLoading}: Props) => {
                         <div className="recipeTitleLeft">
                             <h2>{recipe.name}</h2>
                         </div>
-                        {cookbookState.allowEdit && (
+                        {(cookbookState.allowEdit && cookbookState.isEditing) && (
                             <div className="recipeTitleRight">
                                 <Space>
                                     <Button onClick={() => setIsAddRecipeOpen(true)}>Edit Recipe</Button>
