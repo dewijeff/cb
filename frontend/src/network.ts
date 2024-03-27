@@ -199,7 +199,7 @@ interface LoginResponse {
     jwt: string
 }
 
-export const LoginUser = async (login: UserLogin) => {
+export const LoginUser = async (handleClaims: (token: string) => void, login: UserLogin) => {
     const response = await fetch(`${baseUrl}/cookbook/login/`,
     {
         method: 'POST',
@@ -213,6 +213,7 @@ export const LoginUser = async (login: UserLogin) => {
     {
         const responseJson: LoginResponse = await response.json();
 
+        handleClaims(responseJson.jwt);
         localStorage.setItem(JwtTokenName, responseJson.jwt);
     }
 

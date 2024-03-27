@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Input, Space, Spin } from "antd";
 import { LoginUser, VerifyAuth } from "../network";
 import { useNavigate } from "react-router-dom";
 import { JwtTokenName, UserLogin } from "../models";
+import { jwtDecode } from "jwt-decode";
+import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
+
+interface Claims {
+    canEdit: boolean;
+    email: string;
+}
 
 interface Props {
     switchUser: boolean;
@@ -11,7 +18,8 @@ interface Props {
 const Login = ({switchUser}: Props) => {
     const [showSpin, setShowSpin] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>(null);
-
+    const cookbookDispatch = useContext(CookbookDispatchContext);
+    
     const [form] = Form.useForm<UserLogin>();
 
     const navigate = useNavigate();
@@ -31,6 +39,7 @@ const Login = ({switchUser}: Props) => {
             // user is authorized still - send them to home
             if (checkAuth)
             {
+                handleClaims(localToken);
                 navigate('/cookbook/');
             }
             // user is not authorized - make them log in
@@ -38,11 +47,18 @@ const Login = ({switchUser}: Props) => {
     }, []);
     // ALSO TODO: should this use a cookie or local storage.  local storage and append header manually seems easier to me, but http only cookie seems more secure - look into this later
 
+    const handleClaims = (token: string) => {
+        const claims : Claims = jwtDecode(token);
+        const allowEdit = claims.canEdit; // decoded.claims.something?
+
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.ALLOW_EDIT, payload: allowEdit})
+    }
+
     const onFinish = async() => {
         setShowSpin(true);
         const login = form.getFieldsValue();
 
-        await LoginUser(login)
+        await LoginUser(handleClaims, login)
             .then((response) => {
                 setShowSpin(false);
                 if (response)
