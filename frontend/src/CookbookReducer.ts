@@ -68,13 +68,18 @@ export const CookbookReducer = (state: CookbookState, action: ReducerAction) => 
             return cookbookState;
         }
         case REDUCER_ACTION_TYPE.ALLOW_EDIT: {
+            // handle string true as well as boolean true comparison
+            const allowEdit = (String(action.payload).toLowerCase() === 'true');
+
             const cookbookState : CookbookState = {
                 ...state,
-                allowEdit: action.payload
+                allowEdit: allowEdit
             };
+            console.log('reducer cookbookState', cookbookState);
             return cookbookState;
         }
         case REDUCER_ACTION_TYPE.AUTHENTICATED: {
+            // TODO: @JLD - is this of any value?  it isn't getting used - can I use it to de-authenticate on a call failure?
             const cookbookState : CookbookState = {
                 ...state,
                 isAuthenticated: action.payload

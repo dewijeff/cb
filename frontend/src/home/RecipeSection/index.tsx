@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Recipe } from "../../models";
 import IngredientGroupSection from "./IngredientGroupSection";
 import InstructionGroupSection from "./InstructionGroupSection";
@@ -6,6 +6,7 @@ import 'antd/dist/antd.css';
 import './index.css';
 import { Button, Spin } from "antd";
 import EditRecipe from "../../EditRecipe";
+import { CookbookState, CookbookStateContext } from "../../CookbookReducer";
 
 interface Props {
     loading: boolean;
@@ -14,7 +15,7 @@ interface Props {
 
 const RecipeSection = ({recipe, loading}: Props) => {
     const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false);
-
+    const cookbookState : CookbookState = useContext(CookbookStateContext)
     const handleCloseRecipeModal = () => {
         setIsAddRecipeOpen(false);
     };
@@ -31,10 +32,12 @@ const RecipeSection = ({recipe, loading}: Props) => {
                         <div className="recipeTitleLeft">
                             <h2>{recipe.name}</h2>
                         </div>
-                        <div className="recipeTitleRight">
-                            <Button onClick={() => setIsAddRecipeOpen(true)}>Edit Recipe</Button>
-                            <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal} recipeId={recipe.id}/>
-                        </div>
+                        {cookbookState.allowEdit && (
+                            <div className="recipeTitleRight">
+                                <Button onClick={() => setIsAddRecipeOpen(true)}>Edit Recipe</Button>
+                                <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal} recipeId={recipe.id}/>
+                            </div>
+                        )}
                     </div>
                     <div className="ingredients-container">
                         {recipe.ingredientGroups?.map(x => IngredientGroupSection(x))}
