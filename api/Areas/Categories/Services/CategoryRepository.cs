@@ -24,6 +24,19 @@ public class CategoryRepository : ICategoryRepository
         return result;
     }
 
+    public async Task<IEnumerable<ListingCategory>> GetCategoriesByRecipeId(
+        string recipeId,
+        CancellationToken cancellationToken)
+    {
+        var collection = MongoUtility.GetCollection<ListingCategory>();
+
+        var filter = Builders<ListingCategory>.Filter.Eq("recipes.recipeId", recipeId);
+
+        var result = await collection.Find(filter).ToListAsync(cancellationToken);
+
+        return result;
+    }
+
     public async Task<ListingCategory> AddCategory(ListingCategory category, CancellationToken cancellationToken)
     {
         var collection = MongoUtility.GetCollection<ListingCategory>();

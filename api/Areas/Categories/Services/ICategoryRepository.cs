@@ -8,6 +8,8 @@ public interface ICategoryRepository
 
     Task<ListingCategory> GetCategoryById(string id, CancellationToken cancellationToken);
 
+    Task<IEnumerable<ListingCategory>> GetCategoriesByRecipeId(string recipeId, CancellationToken cancellationToken);
+
     Task<ListingCategory> AddCategory(ListingCategory category, CancellationToken cancellationToken);
 
     Task<long> EditCategory(ListingCategory category, CancellationToken cancelToken);

@@ -39,6 +39,7 @@ const Login = ({switchUser}: Props) => {
             // user is authorized still - send them to home
             if (checkAuth)
             {
+                cookbookDispatch({type: REDUCER_ACTION_TYPE.AUTHENTICATED, payload: true });
                 handleClaims(localToken);
                 navigate('/cookbook/');
             }
@@ -66,6 +67,7 @@ const Login = ({switchUser}: Props) => {
                     setErrorMessage(response);
                 }
 
+                cookbookDispatch({type: REDUCER_ACTION_TYPE.AUTHENTICATED, payload: true });
                 // redirect to home
                 navigate('/cookbook/');
             })

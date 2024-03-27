@@ -3,6 +3,7 @@ using api.Areas.Categories.Services;
 using api.Areas.Ingredients.Services;
 using api.Areas.Recipes.Models;
 using api.Shared.Extensions;
+using System.ComponentModel.DataAnnotations;
 
 namespace api.Areas.Recipes.Services;
 
@@ -99,9 +100,35 @@ public class RecipeDomainService : IRecipeDomainService
 
     public async Task<bool> DeleteRecipe(string id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var recipeDeleted = await _recipeRepository.DeleteRecipe(id, cancellationToken);
+
+        if (!recipeDeleted)
+            return false;
 
         // make sure to remove it from the category also.
+        // get categories containing recipe (should only be one, but just do all of them)
+        var categories = (await _categoryRepository.GetCategoriesByRecipeId(id, cancellationToken)).EmptyIfNull();
+
+        foreach (var category in categories)
+        {
+            var recipesToRemove = category.Recipes.Where(x => x.RecipeId == id).EmptyIfNull();
+
+            var recipes = category.Recipes.ToList();
+            foreach (var recipeToRemove in recipesToRemove)
+            {
+                recipes.Remove(recipeToRemove);
+            }
+
+            category.Recipes = recipes;
+
+            var editedCategoryCount = await _categoryRepository.EditCategory(category, cancellationToken);
+            if (editedCategoryCount != 1)
+            {
+                return false; // This is probably not the best thing to do, but it means something went wrong
+            }
+        }
+
+        return true;
     }
 
     private async Task<Recipe> AddIngredientDataToRecipeIngredients(Recipe recipe, CancellationToken cancellationToken)

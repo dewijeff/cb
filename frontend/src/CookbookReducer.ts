@@ -1,10 +1,11 @@
 import { createContext } from 'react';
-import { Ingredient, Recipe } from './models';
+import { Ingredient, ListingCategory, Recipe } from './models';
 
 export const CookbookStateContext = createContext(null);
 export const CookbookDispatchContext = createContext(null);
 
 export type CookbookState = {
+    listingCategories: ListingCategory[];
     selectedListingRecipeId?: string;
     selectedRecipe?: Recipe;
     ingredients?: Ingredient[];
@@ -14,6 +15,7 @@ export type CookbookState = {
 };
 
 export const cookbookInitialState: CookbookState = {
+    listingCategories: null,
     selectedListingRecipeId: null,
     selectedRecipe: null,
     ingredients: null,
@@ -23,6 +25,7 @@ export const cookbookInitialState: CookbookState = {
 };
 
 export const enum REDUCER_ACTION_TYPE {
+    CATEGORIES_UPDATED,
     SET_SELECTED_RECIPE_ID,
     SET_RECIPE,
     INGREDIENTS_UPDATED,
@@ -38,8 +41,15 @@ type ReducerAction = {
 
 export const CookbookReducer = (state: CookbookState, action: ReducerAction) => {
     switch (action.type) {
-        case REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID: {
+        case REDUCER_ACTION_TYPE.CATEGORIES_UPDATED: {
             // split this out to make typescript happy.
+            const cookbookState : CookbookState = {
+                ...state,
+                listingCategories: action.payload,
+            };
+            return cookbookState;
+        }
+        case REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID: {
             const cookbookState : CookbookState = {
                 ...state,
                 selectedListingRecipeId: action.payload,

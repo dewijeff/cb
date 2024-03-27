@@ -50,9 +50,14 @@ public class RecipesController : Controller
 
     [Authorize]
     [HttpDelete]
-    [Route("recipes")]
-    public async Task<IActionResult> DeleteRecipe([FromQuery] string id, CancellationToken cancellationToken)
+    [Route("recipes/{id}")]
+    public async Task<IActionResult> DeleteRecipe(string id, CancellationToken cancellationToken)
     {
+        var success = await _recipeDomainService.DeleteRecipe(id, cancellationToken);
+
+        if (!success)
+            return BadRequest(); // TODO: @JLD - throw exception?
+
         return new OkResult();
     }
 }

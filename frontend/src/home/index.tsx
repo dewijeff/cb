@@ -8,6 +8,7 @@ import RecipeSection from './RecipeSection';
 import CookbookHeader from '../CookbookHeader';
 import { GetDbCategories, GetDbRecipe } from '../network';
 import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../CookbookReducer';
+import { useNavigate } from 'react-router-dom';
 
 const { Content, Sider } = Layout;
 
@@ -15,20 +16,26 @@ const Home = () => {
     const [contentsLoading, setContentsLoading] = useState(true);
     const [errorLoadingContents, setErrorLoadingContents] = useState(false);
     const [recipeLoading, setRecipeLoading] = useState(false);
-    const [categories, setCategories] = useState<ListingCategory[]>(null);
+    // const [categories, setCategories] = useState<ListingCategory[]>(null);
     const [selectedMenuItems, setSelectedMenuItems] = useState<string[]>(null);
     const [openCategories, setOpenCategories] = useState<string[]>(null);
     const cookbookState: CookbookState = useContext(CookbookStateContext);
     const cookbookDispatch = useContext(CookbookDispatchContext);
+    const navigate = useNavigate();
+    
+    const handleSetContentsLoading = (loading: boolean) => {
+        setContentsLoading(loading)
+    }
 
     const handleLoad = async () => {
-        setContentsLoading(true);
+        handleSetContentsLoading(true);
 
         let categories: ListingCategory[];
         try {
             categories = await GetDbCategories();
 
-            setCategories(categories);
+            cookbookDispatch({type: REDUCER_ACTION_TYPE.CATEGORIES_UPDATED, payload: categories})
+            // setCategories(categories);
 
             if (cookbookState.selectedListingRecipeId)
             {
@@ -42,11 +49,14 @@ const Home = () => {
             setErrorLoadingContents(true);
         }
         finally {
-            setContentsLoading(false);
+            handleSetContentsLoading(false);
         }
     }
 
     useEffect(() => {
+        // this happens when the user hits refresh among other things - use the login page to verify they are logged in, which will send them back here.
+        if (!cookbookState.isAuthenticated)
+            navigate("/");
         handleLoad();
     }, []);
 
@@ -74,7 +84,7 @@ const Home = () => {
         setSelectedMenuItems(selectedKeys);
     };
 
-    const siderItems: MenuProps['items'] = categories?.map(group => ({
+    const siderItems: MenuProps['items'] = cookbookState.listingCategories?.map(group => ({
         key: group.order,
         label: group.name,
         children: group.recipes.map(recipe => {
@@ -112,7 +122,7 @@ const Home = () => {
                                 <div>
                                     {!!cookbookState.selectedRecipe
                                         ?
-                                            (<RecipeSection recipe={cookbookState.selectedRecipe} loading={recipeLoading} />)
+                                            (<RecipeSection recipe={cookbookState.selectedRecipe} loading={recipeLoading} setLoading={handleSetContentsLoading}/>)
                                         :
                                             <h2>{cookbookState.selectedRecipe?.name ?? "Select A Recipe"}</h2>
                                     }

@@ -59,7 +59,8 @@ public class RecipeRepository : IRecipeRepository
 
     public async Task<bool> DeleteRecipe(string id, CancellationToken cancellationToken)
     {
-        var result = await _collection.DeleteOneAsync(id, cancellationToken);
+        var filter = Builders<Recipe>.Filter.Eq("_id", ObjectId.Parse(id));
+        var result = await _collection.DeleteOneAsync(filter, cancellationToken);
 
         return result.DeletedCount > 0;
     }
