@@ -9,6 +9,7 @@ import CookbookHeader from '../CookbookHeader';
 import { GetDbCategories, GetDbRecipe } from '../network';
 import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../CookbookReducer';
 import { useNavigate } from 'react-router-dom';
+import EditCategories from './EditCategories';
 
 const { Content, Sider } = Layout;
 
@@ -107,16 +108,21 @@ const Home = () => {
                     ) : (
                         <Layout>
                             <Sider>
-                                <Menu
-                                    mode="inline"
-                                    defaultSelectedKeys={['1']}
-                                    style={{ height: '100%', borderRight: 0 }}
-                                    items={siderItems}
-                                    selectedKeys={selectedMenuItems}
-                                    openKeys={openCategories}
-                                    onOpenChange={handleOpenChange}
-                                    onSelect={handleMenuSelect}
-                                />
+                                {cookbookState.isEditing ? (
+                                    <EditCategories listingCategories={cookbookState.listingCategories} />
+                                ) : (
+                                    <Menu
+                                        mode="inline"
+                                        defaultSelectedKeys={['1']}
+                                        style={{ height: '100%', borderRight: 0 }}
+                                        items={siderItems}
+                                        selectedKeys={selectedMenuItems}
+                                        openKeys={openCategories}
+                                        onOpenChange={handleOpenChange}
+                                        onSelect={handleMenuSelect}
+                                    />
+                                )}
+
                             </Sider>
                             <Content>
                                 <div>
