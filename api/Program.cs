@@ -1,6 +1,7 @@
 using api.Areas.Auth.Helpers;
 using api.Areas.Auth.Models;
 using api.Configuration.IoC;
+using api.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -19,6 +20,8 @@ builder.Services.AddCategoriesServices();
 JwtOptions jwtOptions = new JwtOptions();
 builder.Configuration.GetSection(jwtSectionName).Bind(jwtOptions);
 
+var jwtSecretKey = Environment.GetEnvironmentVariable(CookbookConstants.JwtSecretVariable) ?? throw new Exception("Jwt Configuration Error");
+
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,7 +38,7 @@ builder.Services.AddAuthentication(x =>
         ValidIssuer = jwtOptions.Issuer,
         ValidAudience = jwtOptions.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+            Encoding.UTF8.GetBytes(jwtSecretKey))
     };
 });
 
