@@ -11,7 +11,7 @@ export enum MeasurementUnit {
     Gram = 7,
     Egg = 8,
     Gallon = 9,
-};
+}
 
 export type Ingredient = {
     id: string;
@@ -33,14 +33,14 @@ export type IngredientGroup = {
     // id: string;
     name: string;
     recipeIngredients: RecipeIngredient[];
-}
+};
 
 export type RecipeStep = {
     // id: string;
     title: string;
     instructions?: string;
     imagePath?: string;
-}
+};
 
 export type RecipeStepGroup = {
     // id: string;
@@ -71,7 +71,7 @@ export type ListingRecipe = {
     order: number;
     name: string;
     recipeId: string;
-}
+};
 
 export type ListingCategory = {
     id: string;
@@ -79,7 +79,7 @@ export type ListingCategory = {
     name: string;
     recipes: ListingRecipe[];
     notes?: string; 
-}
+};
 
 // export type Category = {
 //     id: string;
@@ -90,4 +90,4 @@ export type ListingCategory = {
 export type UserLogin = {
     email: string;
     password: string;
-}
+};

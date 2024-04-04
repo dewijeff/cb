@@ -1,5 +1,6 @@
 ﻿using api.Areas.Categories.Models;
 using api.Areas.Recipes.Services;
+using api.Shared;
 
 namespace api.Areas.Categories.Services;
 
@@ -21,7 +22,7 @@ public sealed class CategoryDomainService : ICategoryDomainService
         throw new NotImplementedException();
     }
 
-    public Task<ListingCategory> EditCategory(ListingCategory category, CancellationToken cancellationToken)
+    public async Task<ListingCategory> EditCategory(ListingCategory category, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

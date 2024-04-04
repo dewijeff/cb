@@ -10,7 +10,6 @@ namespace api.Areas.Ingredients;
 
 [Authorize]
 [ApiController]
-[Route("cookbook")]
 public class IngredientsController : Controller
 {
     private readonly JsonSerializerOptions _jsonSettings = CommonSerializerOptions.SerializerOptions;

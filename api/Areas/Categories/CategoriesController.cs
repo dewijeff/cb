@@ -10,7 +10,6 @@ namespace api.Areas.Categories;
 
 [Authorize]
 [ApiController]
-[Route("cookbook")]
 public class CategoriesController : Controller
 {
     private readonly JsonSerializerOptions _jsonSettings = CommonSerializerOptions.SerializerOptions;
@@ -23,7 +22,7 @@ public class CategoriesController : Controller
         _categoryRepository = categoryRepository;
         _categoryDomainService = categoryDomainService;
     }
-    
+
     [HttpGet]
     [Route("categories")]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
@@ -40,7 +39,18 @@ public class CategoriesController : Controller
     public async Task<IActionResult> AddCategory([FromBody] ListingCategory category,
         CancellationToken cancellationToken)
     {
-        var response = _categoryDomainService.AddCategory(category, cancellationToken);
+        var response = await _categoryRepository.AddCategory(category, cancellationToken);
+
+        return Json(response, _jsonSettings);
+    }
+
+    // TODO: I'd rather have this happen all at once, but this is more in line with the REST pattern.
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
+    [HttpPut]
+    [Route("categories")]
+    public async Task<IActionResult> EditCategory([FromBody] ListingCategory category, CancellationToken cancellationToken)
+    {
+        var response = await _categoryRepository.EditCategory(category, cancellationToken);
 
         return Json(response, _jsonSettings);
     }

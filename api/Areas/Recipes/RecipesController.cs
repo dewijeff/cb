@@ -1,4 +1,5 @@
-﻿using api.Areas.Recipes.Models;
+﻿using api.Areas.Auth.Models;
+using api.Areas.Recipes.Models;
 using api.Areas.Recipes.Services;
 using api.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +8,8 @@ using System.Text.Json;
 
 namespace api.Areas.Recipes;
 
+[Authorize]
 [ApiController]
-[Route("cookbook")]
 public class RecipesController : Controller
 {
     private readonly JsonSerializerOptions _jsonSettings = CommonSerializerOptions.SerializerOptions;
@@ -18,7 +19,6 @@ public class RecipesController : Controller
     {
         _recipeDomainService = recipeDomainService;
     }
-
     [HttpGet]
     [Route("recipes/{id}")]
     public async Task<IActionResult> GetRecipe(string id, CancellationToken cancellationToken)
@@ -28,7 +28,7 @@ public class RecipesController : Controller
         return Json(recipe, _jsonSettings);
     }
 
-    [Authorize]
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpPost]
     [Route("recipes")]
     public async Task<IActionResult> AddRecipe([FromBody] Recipe request, CancellationToken cancellationToken)
@@ -38,7 +38,7 @@ public class RecipesController : Controller
         return Json(recipe, _jsonSettings);
     }
 
-    [Authorize]
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpPut]
     [Route("recipes/{id}")]
     public async Task<IActionResult> UpdateRecipe(string id, [FromBody] Recipe request, CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public class RecipesController : Controller
         return Json(recipe, _jsonSettings);
     }
 
-    [Authorize]
+    [Authorize(Policy = IdentityData.CanEditPolicyName)]
     [HttpDelete]
     [Route("recipes/{id}")]
     public async Task<IActionResult> DeleteRecipe(string id, CancellationToken cancellationToken)

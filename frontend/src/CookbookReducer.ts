@@ -9,7 +9,8 @@ export type CookbookState = {
     selectedListingRecipeId?: string;
     selectedRecipe?: Recipe;
     ingredients?: Ingredient[];
-    editIngredientsOpen: boolean;
+    editRecipeOpen: boolean;
+    editIngredientOpen: boolean;
     allowEdit: boolean;
     isEditing: boolean;
     isAuthenticated: boolean;
@@ -20,7 +21,8 @@ export const cookbookInitialState: CookbookState = {
     selectedListingRecipeId: null,
     selectedRecipe: null,
     ingredients: null,
-    editIngredientsOpen: false,
+    editRecipeOpen: false,
+    editIngredientOpen: false,
     allowEdit: false,
     isEditing: false,
     isAuthenticated: false,
@@ -31,11 +33,12 @@ export const enum REDUCER_ACTION_TYPE {
     SET_SELECTED_RECIPE_ID,
     SET_RECIPE,
     INGREDIENTS_UPDATED,
+    EDIT_RECIPE_OPEN,
     EDIT_INGREDIENT_OPEN,
     ALLOW_EDIT,
     SET_EDITING,
     AUTHENTICATED,
-};
+}
 
 type ReducerAction = {
     type: REDUCER_ACTION_TYPE,
@@ -73,10 +76,17 @@ export const CookbookReducer = (state: CookbookState, action: ReducerAction) => 
             };
             return cookbookState;
         }
+        case REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN: {
+            const cookbookState: CookbookState = {
+                ...state,
+                editRecipeOpen: action.payload
+            }
+            return cookbookState;
+        }
         case REDUCER_ACTION_TYPE.EDIT_INGREDIENT_OPEN: {
             const cookbookState : CookbookState = {
                 ...state,
-                editIngredientsOpen: action.payload
+                editIngredientOpen: action.payload
             };
             return cookbookState;
         }

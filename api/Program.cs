@@ -45,7 +45,7 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddAuthorization(o =>
 {
     o.AddPolicy(IdentityData.CanEditPolicyName, p =>
-        p.RequireClaim(IdentityData.CanEditClaimName, "true"));
+        p.RequireClaim(IdentityData.CanEditClaimName, "True"));
 });
 
 builder.Services.ConfigureOptions<JwtOptionsSetup>();

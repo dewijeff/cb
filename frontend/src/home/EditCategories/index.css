@@ -1,0 +1,30 @@
+.category-row-container {
+    display: grid;
+    grid-template-columns: 75% 25%
+}
+
+.category-name {
+    grid-column: 1
+}
+
+.category-actions {
+    grid-column: 2;
+    text-align: right;
+}
+
+.category-actions-container {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+}
+
+.remove-category-action {
+    grid-column: 1;
+}
+
+.move-up-category-action {
+    grid-column: 2;
+}
+
+.move-down-category-action {
+    grid-column: 3;
+}
