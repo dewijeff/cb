@@ -40,12 +40,10 @@ const initialRecipe: Recipe = {
 }
 
 interface Props {
-    isOpen: boolean;
-    handleClose: () => void;
     recipeId?: string;
-};
+}
 
-const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
+const EditRecipe = ({ recipeId }: Props) => {
     // const [ingredients, setIngredients] = useState([{}]);
     const [categories, setCategories] = useState([{}]);
     const [recipe, setRecipe] = useState<Recipe>(null);
@@ -61,7 +59,7 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
     const handleCancel = () => {
         form.resetFields();
         form.setFieldsValue(initialRecipe);
-        handleClose();
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:false});
     };
 
     const handleAddIngredient = () => {
@@ -70,8 +68,8 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
 
     const onFinish = async () => {
         setWorking(true);
-        console.log('formdata', form.getFieldsValue());
-        var recipe = form.getFieldsValue();
+
+        const recipe = form.getFieldsValue();
         recipe.id = recipeId;
 
         if (!recipeId)
@@ -84,7 +82,7 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
         }
 
         setWorking(false);
-        handleClose();
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:false});
         form.resetFields();
         form.setFieldsValue(initialRecipe);
     };
@@ -96,7 +94,7 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
             description: 'There was an error saving. Please try again later.',
         });
         setWorking(false);
-        handleClose();
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:false});
         form.resetFields();
         form.setFieldsValue(initialRecipe);
     };
@@ -106,13 +104,13 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
             return;
 
         setLoading(true);
-        if (isOpen && !!recipeId)
+        if (cookbookState.editRecipeOpen && !!recipeId)
         {
             GetDbRecipe(recipeId)
             .then(setRecipe);
         }
         setLoading(false);
-    }, [isOpen]);
+    }, [cookbookState.editRecipeOpen]);
 
     useEffect(() => {
         setLoading(true);
@@ -149,21 +147,19 @@ const EditRecipe = ({ isOpen, handleClose, recipeId }: Props) => {
 
     const showSpin = loading || working;
 
-    console.log(recipe);
-
     return(
         <Drawer
             width={"100%"}
             title='Add Recipe'
-            open={isOpen}
+            open={cookbookState.editRecipeOpen}
             onClose={handleCancel} extra={
-            <Space>
-                <Button onClick={handleAddIngredient}>Add Ingredient</Button>
-                <Button onClick={handleCancel}>Cancel</Button>
-                <Button onClick={() => form.submit()} type="primary" htmlType="submit">
-                    Save
-                </Button>
-            </Space>
+                <Space>
+                    <Button onClick={handleAddIngredient}>Add Ingredient</Button>
+                    <Button onClick={handleCancel}>Cancel</Button>
+                    <Button onClick={() => form.submit()} type="primary" htmlType="submit">
+                        Save
+                    </Button>
+                </Space>
         }> 
             <Spin spinning={showSpin}>
                 {loading ? (

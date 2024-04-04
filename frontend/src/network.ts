@@ -15,7 +15,7 @@ const baseUrl = "https://localhost:7014"
 export const GetDbCategories = async () => {
     // TODO: Make this better - lots of repetitive code around authorization - has to be a way to wrap this to add the Authorization Header automatically.  Also would like to change state based on a 401 from any of these and kick the user back to the login page...
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/categories/`,
+    const response = await fetch(`${baseUrl}/categories/`,
     {
         method: 'GET',
         headers: {
@@ -30,10 +30,65 @@ export const GetDbCategories = async () => {
     return categories;
 }
 
+export const AddDbCategory = async (category: ListingCategory) => {
+    const jwt = localStorage.getItem(JwtTokenName);
+    const response = await fetch(`${baseUrl}/categories`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwt}`
+            },
+            body: JSON.stringify(category)
+        });
+
+    if (!response.ok)
+    {
+        console.log(response);
+        throw new Error("Error Adding Category");
+    }
+};
+
+export const EditDbCategory = async (category: ListingCategory) => {
+    const jwt = localStorage.getItem(JwtTokenName);
+    const response = await fetch(`${baseUrl}/categories`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwt}`
+            },
+            body: JSON.stringify(category)
+        });
+
+    if (!response.ok)
+    {
+        console.log(response);
+        throw new Error("Error Editing Category");
+    }
+};
+
+export const DeleteDbCategory = async (categoryId: string) => {
+    const jwt = localStorage.getItem(JwtTokenName);
+    const response = await fetch(`${baseUrl}/categories/${categoryId}`,
+        {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${jwt}`
+            }
+        });
+
+    if (!response.ok)
+    {
+        console.log(response);
+        throw new Error("Error Deleting Category");
+    }
+};
+
 // Recipes
 export const GetDbRecipe = async (recipeId: string) => {
     const jwt = localStorage.getItem(JwtTokenName);
-    const url = `${baseUrl}/cookbook/recipes/${recipeId}`
+    const url = `${baseUrl}/recipes/${recipeId}`
     const response = await fetch(url,
         {
             method: 'GET',
@@ -52,7 +107,7 @@ export const GetDbRecipe = async (recipeId: string) => {
 export const AddDbRecipe = async (recipe: Recipe) => {
     // Add new recipe to db
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/recipes`,
+    const response = await fetch(`${baseUrl}/recipes`,
     {
         method: 'POST',
         headers: {
@@ -75,7 +130,7 @@ export const AddDbRecipe = async (recipe: Recipe) => {
 export const EditDbRecipe = async (recipe: Recipe) => {
     // Replaces entire recipe with new content
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/recipes/${recipe.id}`,
+    const response = await fetch(`${baseUrl}/recipes/${recipe.id}`,
     {
         method: 'PUT',
         headers: {
@@ -97,7 +152,7 @@ export const EditDbRecipe = async (recipe: Recipe) => {
 
 export const DeleteDbRecipe = async (recipeId: string) => {
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch (`${baseUrl}/cookbook/recipes/${recipeId}`,
+    const response = await fetch (`${baseUrl}/recipes/${recipeId}`,
     {
         method: 'DELETE',
         headers: {
@@ -116,7 +171,7 @@ export const DeleteDbRecipe = async (recipeId: string) => {
 // Ingredients
 export const GetDbIngredients = async () => {
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/ingredients/`,
+    const response = await fetch(`${baseUrl}/ingredients/`,
     {
         method: 'GET',
         headers: {
@@ -134,7 +189,7 @@ export const GetDbIngredients = async () => {
 
 export const AddDbIngredient = async (ingredient: Ingredient) => {
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/ingredients`,
+    const response = await fetch(`${baseUrl}/ingredients`,
     {
         method: 'POST',
         headers: {
@@ -155,7 +210,7 @@ export const AddDbIngredient = async (ingredient: Ingredient) => {
 
 export const EditDbIngredient = async (ingredient: Ingredient) => {
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/ingredients/${ingredient.id}`,
+    const response = await fetch(`${baseUrl}/ingredients/${ingredient.id}`,
     {
         method: 'PUT',
         headers: {
@@ -175,7 +230,7 @@ export const EditDbIngredient = async (ingredient: Ingredient) => {
 
 export const DeleteDbIngredient = async (ingredientId: string) => {
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/ingredients/${ingredientId}`,
+    const response = await fetch(`${baseUrl}/ingredients/${ingredientId}`,
     {
         method: 'DELETE',
         headers: {
@@ -200,7 +255,7 @@ interface LoginResponse {
 }
 
 export const LoginUser = async (handleClaims: (token: string) => void, login: UserLogin) => {
-    const response = await fetch(`${baseUrl}/cookbook/login/`,
+    const response = await fetch(`${baseUrl}/login/`,
     {
         method: 'POST',
         headers: {
@@ -222,7 +277,7 @@ export const LoginUser = async (handleClaims: (token: string) => void, login: Us
 
 export const VerifyAuth = async () => {
     const jwt = localStorage.getItem(JwtTokenName);
-    const response = await fetch(`${baseUrl}/cookbook/verify/`,
+    const response = await fetch(`${baseUrl}/verify/`,
     {
         method: 'GET',
         headers: {

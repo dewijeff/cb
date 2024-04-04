@@ -2,14 +2,15 @@
 using api.Areas.Auth.Models;
 using api.Areas.Auth.Services;
 using api.Shared;
+using DnsClient;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using static api.Areas.Auth.AuthController;
 
 namespace api.Areas.Auth;
 
 [ApiController]
-[Route("cookbook")]
 public class AuthController : Controller
 {
     public class UserDto
@@ -18,11 +19,18 @@ public class AuthController : Controller
         public string Name { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
-
+    
     public class LoginDto
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class PasswordChangeDto
+    {
+        public string Email { get; set; } = String.Empty;
+        public string OldPassword { get; set; } = String.Empty;
+        public string NewPassword { get; set; } = String.Empty;
     }
 
     private readonly JsonSerializerOptions _jsonSettings = CommonSerializerOptions.SerializerOptions;
@@ -54,6 +62,29 @@ public class AuthController : Controller
         return Json(user, _jsonSettings);
 
         // TODO: @JLD - should these all be Created, Updated... responses instead of Json, which is just a 200?  I don't plan on needing it in the front end, but is it a more "correct" response?
+    }
+
+    [HttpPost]
+    [Route("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeDto passwordChangeDto,
+        CancellationToken cancellationToken)
+    {
+        var user = await _userRepository.GetUserByEmail(passwordChangeDto.Email, cancellationToken);
+
+        if (user == null)
+        {
+            // return something indicating user was not found
+            return NotFound();
+        }
+
+        // verify old password
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(passwordChangeDto.OldPassword, user.Password)) return Unauthorized();
+
+        user.Password = BCrypt.Net.BCrypt.EnhancedHashPassword(passwordChangeDto.NewPassword);
+
+        await _userRepository.EditUser(user, cancellationToken);
+
+        return Ok();
     }
 
     [HttpPost]

@@ -8,6 +8,7 @@ import { Button, Popconfirm, Space, Spin } from "antd";
 import EditRecipe from "../../EditRecipe";
 import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../../CookbookReducer";
 import { DeleteDbRecipe, GetDbCategories } from "../../network";
+import EditIngredient from "../../EditIngredient";
 
 interface Props {
     recipe: Recipe;
@@ -53,7 +54,7 @@ const RecipeSection = ({recipe, loading, setLoading}: Props) => {
                         {(cookbookState.allowEdit && cookbookState.isEditing) && (
                             <div className="recipeTitleRight">
                                 <Space>
-                                    <Button onClick={() => setIsAddRecipeOpen(true)}>Edit Recipe</Button>
+                                    <Button onClick={() => cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:true})}>Edit Recipe</Button>
                                     <Popconfirm
                                         title={"Are you sure you want to delete this recipe?"}
                                         onConfirm={handleDelete}
@@ -62,7 +63,6 @@ const RecipeSection = ({recipe, loading, setLoading}: Props) => {
                                         <Button danger>Delete Recipe</Button>
                                     </Popconfirm>
                                 </Space>
-                                <EditRecipe isOpen={isAddRecipeOpen} handleClose={handleCloseRecipeModal} recipeId={recipe.id}/>
                             </div>
                         )}
                     </div>

@@ -2,17 +2,13 @@ import { Form, Space, Input, Checkbox, Modal, notification, Spin, message } from
 import React, { useContext, useState } from "react";
 import { Ingredient } from "../models";
 import { AddDbIngredient, GetDbIngredients } from "../network";
-import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
+import {CookbookDispatchContext, REDUCER_ACTION_TYPE, CookbookStateContext, CookbookState} from "../CookbookReducer";
 
-interface Props {
-    isOpen: boolean;
-    handleClose: () => void;
-};
-
-const EditIngredient = ({isOpen, handleClose}: Props) => {
+const EditIngredient = () => {
     const [working, setWorking] = useState(false);
     const cookbookDispatch = useContext(CookbookDispatchContext)
-    
+    const cookbookState : CookbookState = useContext(CookbookStateContext);
+
     const [form] = Form.useForm<Ingredient>();
 
     const onFinish = async () => {
@@ -37,7 +33,7 @@ const EditIngredient = ({isOpen, handleClose}: Props) => {
         }
 
         form.resetFields();
-        handleClose();
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_INGREDIENT_OPEN, payload: false});
     }
 
     const onFinishFailed = (errorinfo: any) => {
@@ -52,7 +48,7 @@ const EditIngredient = ({isOpen, handleClose}: Props) => {
     }
 
     return (
-        <Modal title="Add Ingredient" open={isOpen} onCancel={handleClose} onOk={() => form.submit()} okText='Add Ingredient'> 
+        <Modal title="Add Ingredient" open={cookbookState.editIngredientOpen} onCancel={() => cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_INGREDIENT_OPEN, payload: false})} onOk={() => form.submit()} okText='Add Ingredient'>
             <Spin spinning={working}>
                 <Form
                     style={{marginLeft: '10'}}

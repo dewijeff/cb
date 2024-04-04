@@ -1,10 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Form, Input, Space, Spin } from "antd";
+import { Button, Form, Input, Layout, Space, Spin } from "antd";
 import { LoginUser, VerifyAuth } from "../network";
 import { useNavigate } from "react-router-dom";
 import { JwtTokenName, UserLogin } from "../models";
 import { jwtDecode } from "jwt-decode";
 import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
+import CookbookHeader from "../CookbookHeader";
+
+const { Content, Sider } = Layout;
 
 interface Claims {
     canEdit: boolean;
@@ -17,6 +20,7 @@ interface Props {
 
 const Login = ({switchUser}: Props) => {
     const [showSpin, setShowSpin] = useState(true);
+    const [showLoginSpin, setShowLoginSpin] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>(null);
     const cookbookDispatch = useContext(CookbookDispatchContext);
     
@@ -25,7 +29,15 @@ const Login = ({switchUser}: Props) => {
     const navigate = useNavigate();
 
     const checkAuth = async (token: string) => {
-        const authVerified = await VerifyAuth();
+        let authVerified = false;
+        try {
+            authVerified = await VerifyAuth();
+        }
+        catch (e)
+        {
+            setShowSpin(false);
+            setErrorMessage('Error verifying authorization - is the api running?');
+        }
 
         if (authVerified)
         {
@@ -47,6 +59,8 @@ const Login = ({switchUser}: Props) => {
         if (localToken)
         {
             checkAuth(localToken);
+        } else {
+            setShowSpin(false);
         }
     }, []);
     // ALSO TODO: should this use a cookie or local storage.  local storage and append header manually seems easier to me, but http only cookie seems more secure - look into this later
@@ -59,12 +73,12 @@ const Login = ({switchUser}: Props) => {
     }
 
     const onFinish = async() => {
-        setShowSpin(true);
+        setShowLoginSpin(true);
         const login = form.getFieldsValue();
 
         await LoginUser(handleClaims, login)
             .then((response) => {
-                setShowSpin(false);
+                setShowLoginSpin(false);
                 if (response)
                 {
                     setErrorMessage(response);
@@ -76,39 +90,49 @@ const Login = ({switchUser}: Props) => {
             })
             .catch((ex) => {
                 console.log(ex);
-                setErrorMessage(ex);
-                setShowSpin(false);
+                setErrorMessage(ex.message);
+                setShowLoginSpin(false);
             });
     };
 
     const onFinishFailed = () =>
     {
-        setShowSpin(false);
+        setShowLoginSpin(false);
     }
 
     // TODO: @JLD - make this pretty
     return (
-        <Spin spinning={showSpin}>
-            {!showSpin ? (
-                <Form
-                form={form}
-                name="Login"
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}>
-                <Space direction='vertical'>
-                    <Form.Item label='Email:' name='email'>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item label='Password:' name='password'>
-                        <Input.Password placeholder='input password'/>
-                    </Form.Item>
-                    <Button type='primary' onClick={form.submit}>Login</Button>
-                    {errorMessage}
-                </Space>
-            </Form>
-            ) :
-            (<div>Loading</div>)}
-        </Spin>
+        <Layout>
+            <CookbookHeader cookbookName={null}/>
+            <Content style={{height: "100%"}}>
+                <Spin spinning={showSpin}>
+                    {!showSpin ? (
+                        <div className="form-container" style={{paddingTop: "1em", paddingLeft: "4em", height: "100%"}}>
+                            <Spin spinning={showLoginSpin}>
+                                <Form
+                                    form={form}
+                                    name="Login"
+                                    onFinish={onFinish}
+                                    onFinishFailed={onFinishFailed}>
+                                    <Space direction='vertical'>
+                                        <Form.Item label='Email:' name='email'>
+                                            <Input />
+                                        </Form.Item>
+                                        <Form.Item label='Password:' name='password'>
+                                            <Input.Password placeholder='input password'/>
+                                        </Form.Item>
+                                        <Button htmlType='submit' type='primary' onClick={form.submit}>Login</Button>
+                                        {errorMessage}
+                                    </Space>
+                                </Form>
+                            </Spin>
+                        </div>
+
+                    ) :
+                    (<div>Loading</div>)}
+                </Spin>
+            </Content>
+        </Layout>
     );
 }
 

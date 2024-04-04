@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using api.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -17,6 +18,8 @@ public class JwtBearerOptionsSetup : IConfigureOptions<JwtBearerOptions>
 
     public void Configure(JwtBearerOptions options)
     {
+        var jwtSecretKey = Environment.GetEnvironmentVariable(CookbookConstants.JwtSecretVariable) ?? throw new Exception("Jwt Configuration Error");
+
         options.TokenValidationParameters = new()
         {
             ValidateIssuer = true,
@@ -26,7 +29,7 @@ public class JwtBearerOptionsSetup : IConfigureOptions<JwtBearerOptions>
             ValidIssuer = _jwtOptions.Issuer,
             ValidAudience = _jwtOptions.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtOptions.SecretKey))
+                Encoding.UTF8.GetBytes(jwtSecretKey))
         };
     }
 }

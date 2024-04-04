@@ -9,6 +9,9 @@ import CookbookHeader from '../CookbookHeader';
 import { GetDbCategories, GetDbRecipe } from '../network';
 import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../CookbookReducer';
 import { useNavigate } from 'react-router-dom';
+import EditCategories from './EditCategories';
+import EditIngredient from "../EditIngredient";
+import EditRecipe from "../EditRecipe";
 
 const { Content, Sider } = Layout;
 
@@ -96,6 +99,13 @@ const Home = () => {
         })
     }));
 
+    const siderWidth = () => {
+        if (cookbookState.isEditing)
+            return 500;
+
+        return 250;
+    }
+
     return (
         <Layout>
             <CookbookHeader cookbookName={CookbookName}/>
@@ -106,17 +116,22 @@ const Home = () => {
                         </>
                     ) : (
                         <Layout>
-                            <Sider>
-                                <Menu
-                                    mode="inline"
-                                    defaultSelectedKeys={['1']}
-                                    style={{ height: '100%', borderRight: 0 }}
-                                    items={siderItems}
-                                    selectedKeys={selectedMenuItems}
-                                    openKeys={openCategories}
-                                    onOpenChange={handleOpenChange}
-                                    onSelect={handleMenuSelect}
-                                />
+                            <Sider width={siderWidth()} style={{maxHeight: "900px", overflowX: "hidden", overflowY: "auto"}}>
+                                {cookbookState.isEditing ? (
+                                    <EditCategories listingCategories={cookbookState.listingCategories} />
+                                ) : (
+                                    <Menu
+                                        mode="inline"
+                                        defaultSelectedKeys={['1']}
+                                        style={{ height: '100%', borderRight: 0 }}
+                                        items={siderItems}
+                                        selectedKeys={selectedMenuItems}
+                                        openKeys={openCategories}
+                                        onOpenChange={handleOpenChange}
+                                        onSelect={handleMenuSelect}
+                                    />
+                                )}
+
                             </Sider>
                             <Content>
                                 <div>
@@ -126,6 +141,8 @@ const Home = () => {
                                         :
                                             <h2>{cookbookState.selectedRecipe?.name ?? "Select A Recipe"}</h2>
                                     }
+                                    <EditIngredient />
+                                    <EditRecipe />
                                 </div>
                             </Content>
                         </Layout>
