@@ -54,7 +54,7 @@ const RecipeSection = ({recipe, loading, setLoading}: Props) => {
                         {(cookbookState.allowEdit && cookbookState.isEditing) && (
                             <div className="recipeTitleRight">
                                 <Space>
-                                    <Button onClick={() => cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:true})}>Edit Recipe</Button>
+                                    <Button onClick={() => cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:{ isOpen: true, recipe: cookbookState.selectedRecipe}})}>Edit Recipe</Button>
                                     <Popconfirm
                                         title={"Are you sure you want to delete this recipe?"}
                                         onConfirm={handleDelete}

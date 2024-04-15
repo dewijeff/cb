@@ -3,7 +3,7 @@ import { MeasurementUnit, Recipe } from "../models";
 import { Button, Drawer, Form, Input, InputNumber, Select, Space, Spin, notification } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from "antd/lib/input/TextArea";
-import { AddDbRecipe, EditDbRecipe, GetDbCategories, GetDbIngredients, GetDbRecipe } from "../network";
+import { AddDbRecipe, EditDbRecipe, GetDbCategories, GetDbIngredients } from "../network";
 import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
 
 // initial recipe has no 
@@ -39,18 +39,14 @@ const initialRecipe: Recipe = {
     ]
 }
 
-interface Props {
-    recipeId?: string;
-}
-
-const EditRecipe = ({ recipeId }: Props) => {
+const EditRecipe = () => {
     // const [ingredients, setIngredients] = useState([{}]);
     const [categories, setCategories] = useState([{}]);
     const [recipe, setRecipe] = useState<Recipe>(null);
     const [measurementUnits, setMeasurementUnits] = useState([{}]);
     const [loading, setLoading] = useState(true);
     const [working, setWorking] = useState(false);
-    const [initialLoad, setInitialLoad] = useState(true);
+    // const [initialLoad, setInitialLoad] = useState(true);
     const cookbookDispatch = useContext(CookbookDispatchContext);
     const cookbookState: CookbookState = useContext(CookbookStateContext);
 
@@ -70,9 +66,9 @@ const EditRecipe = ({ recipeId }: Props) => {
         setWorking(true);
 
         const recipe = form.getFieldsValue();
-        recipe.id = recipeId;
+        recipe.id = cookbookState.editRecipeOpen.recipe.id;
 
-        if (!recipeId)
+        if (!cookbookState.editRecipeOpen.recipe)
         {
             const recipeResult = await AddDbRecipe(recipe);
             cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_SELECTED_RECIPE_ID, payload: recipeResult.id });
@@ -82,7 +78,7 @@ const EditRecipe = ({ recipeId }: Props) => {
         }
 
         setWorking(false);
-        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:false});
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload: {isOpen: false, recipeId: null}});
         form.resetFields();
         form.setFieldsValue(initialRecipe);
     };
@@ -94,20 +90,22 @@ const EditRecipe = ({ recipeId }: Props) => {
             description: 'There was an error saving. Please try again later.',
         });
         setWorking(false);
-        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:false});
+        cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload:{isOpen: false, recipeId: null}});
         form.resetFields();
         form.setFieldsValue(initialRecipe);
     };
 
     useEffect(() => {
-        if(initialLoad)
+        if(!cookbookState.editRecipeOpen.isOpen)
             return;
 
         setLoading(true);
-        if (cookbookState.editRecipeOpen && !!recipeId)
+        if (cookbookState.editRecipeOpen.isOpen && !!cookbookState.editRecipeOpen.recipe)
         {
-            GetDbRecipe(recipeId)
-            .then(setRecipe);
+            setRecipe(cookbookState.editRecipeOpen.recipe);
+            form.setFieldsValue(cookbookState.editRecipeOpen.recipe);
+            // GetDbRecipe(cookbookState.editRecipeOpen.recipe)
+            // .then(setRecipe);
         }
         setLoading(false);
     }, [cookbookState.editRecipeOpen]);
@@ -124,13 +122,7 @@ const EditRecipe = ({ recipeId }: Props) => {
         .then((categories) => categories.map((category) => ({value: category.id, label: category.name})))
         .then(setCategories);
 
-        if (!!recipeId)
-        {
-            GetDbRecipe(recipeId)
-            .then(setRecipe)
-        } else {
-            setRecipe(initialRecipe);
-        }
+        setRecipe(initialRecipe);
 
         // NOTE: The filter only works if the enum is using a number as the value.
         const measurements = Object.entries(MeasurementUnit).filter(([_, value]) => !isNaN(Number(value))).map(([label, value]) => (
@@ -142,16 +134,19 @@ const EditRecipe = ({ recipeId }: Props) => {
 
         setMeasurementUnits(measurements);
         setLoading(false);
-        setInitialLoad(false);
+        // setInitialLoad(false);
     }, []);
 
     const showSpin = loading || working;
 
+    console.log(cookbookState.editRecipeOpen);
+    console.log(recipe);
+
     return(
         <Drawer
-            width={"100%"}
+            width={'100%'}
             title='Add Recipe'
-            open={cookbookState.editRecipeOpen}
+            open={cookbookState.editRecipeOpen.isOpen}
             onClose={handleCancel} extra={
                 <Space>
                     <Button onClick={handleAddIngredient}>Add Ingredient</Button>
@@ -184,7 +179,7 @@ const EditRecipe = ({ recipeId }: Props) => {
                                     label="Recipe Category:"
                                     name="categoryId"
                                     rules={[{required: true, message:"required"}]}>
-                                    <Select placeholder="Select a category" options={categories} />
+                                    <Select dropdownMatchSelectWidth={false} style={{width: "15rem"}} placeholder="Select a category" options={categories} />
                                 </Form.Item>
                             </Space>
                             <h3>Ingredients</h3>
@@ -194,11 +189,13 @@ const EditRecipe = ({ recipeId }: Props) => {
                                         <Space direction='vertical'>
                                             {ingredientGroups.map((ingredientGroup) => (
                                                 <Space direction='vertical' key={ingredientGroup.key}>
-                                                    <Space direction='horizontal'>
+                                                    <Space direction='horizontal' align="center">
                                                         <Form.Item name={[ingredientGroup.name, 'name']} label='Group Name:' rules={[{required: true, message:"required"}]}>
                                                             <Input />
                                                         </Form.Item>
-                                                        <MinusCircleOutlined onClick={() => removeIngredientGroup(ingredientGroup.name)} />
+                                                        <Form.Item>
+                                                            <MinusCircleOutlined onClick={() => removeIngredientGroup(ingredientGroup.name)} />
+                                                        </Form.Item>
                                                     </Space>
                                                     <Form.List name={[ingredientGroup.name, 'recipeIngredients']}>
                                                         {(recipeIngredients, {add: addIngredient, remove: removeIngredient}) => (
@@ -207,16 +204,18 @@ const EditRecipe = ({ recipeId }: Props) => {
                                                                     {recipeIngredients.map((ingredientField) => (
                                                                         <Space direction="horizontal" key={ingredientField.key}>
                                                                             <Form.Item name={[ingredientField.name, 'ingredientId']} rules={[{required: true, message:"required"}]}>
-                                                                                <Select placeholder="Select an ingredient" options={cookbookState.ingredients}/>
+                                                                                <Select dropdownMatchSelectWidth={false} style={{width: "15rem"}} placeholder="Select an ingredient" options={cookbookState.ingredients}/>
                                                                             </Form.Item>
                                                                             <Form.Item name={[ingredientField.name, 'amount']} rules={[{required: true, message:"required"}]}>
                                                                                 <InputNumber/>
                                                                             </Form.Item>
                                                                             <Form.Item name={[ingredientField.name, 'unit']} rules={[{required: true, message:"required"}]}>
-                                                                                <Select placeholder='Select a unit' options={measurementUnits}/>
-                                                                            </Form.Item>                                                          
-                                                                        <MinusCircleOutlined onClick={() => removeIngredient(ingredientField.name)} />
-                                                                    </Space>
+                                                                                <Select dropdownMatchSelectWidth={false} style={{width: "15rem"}} placeholder='Select a unit' options={measurementUnits}/>
+                                                                            </Form.Item>
+                                                                            <Form.Item>
+                                                                                <MinusCircleOutlined onClick={() => removeIngredient(ingredientField.name)} />
+                                                                            </Form.Item>
+                                                                        </Space>
                                                                     ))}
                                                                 </Space>
                                                                 <Button type="dashed" onClick={() => addIngredient()} block icon={<PlusOutlined />}>
@@ -245,24 +244,28 @@ const EditRecipe = ({ recipeId }: Props) => {
                                                         <Form.Item name={[stepGroup.name, 'name']} label='Step Grouping:' rules={[{required: true, message:"required"}]}>
                                                             <Input/>
                                                         </Form.Item>
-                                                        <MinusCircleOutlined onClick={() => removeStepGroup(stepGroup.name)}/>
+                                                        <Form.Item>
+                                                            <MinusCircleOutlined onClick={() => removeStepGroup(stepGroup.name)}/>
+                                                        </Form.Item>
                                                     </Space>
                                                     <Form.List name={[stepGroup.name, 'steps']}>
                                                         {(steps, {add: addStep, remove: removeStep}) => (
                                                             <>
                                                                 <Space direction='vertical'>
                                                                     {steps.map((step) => (
-                                                                        <Space direction='horizontal' key={step.key}>
+                                                                        <Space direction='horizontal' key={step.key} style={{alignItems: 'start'}}>
                                                                             <Form.Item name={[step.name, 'title']} label='Title:' rules={[{required: true, message:"required"}]}>
-                                                                                <TextArea rows={4}/>
+                                                                                <TextArea rows={4} style={{width: '25rem'}}/>
                                                                             </Form.Item>
                                                                             <Form.Item name={[step.name, 'instructions']} label='Instructions:'>
-                                                                                <TextArea rows={4}/>
+                                                                                <TextArea rows={4} style={{width: '25rem'}}/>
                                                                             </Form.Item>
                                                                             <Form.Item name={[step.name, 'imagePath']} label='Image Path:'>
-                                                                                <Input/>
+                                                                                <Input style={{width: '25rem'}} />
                                                                             </Form.Item>
-                                                                            <MinusCircleOutlined onClick={() => removeStep(step.name)}/>
+                                                                            <Form.Item>
+                                                                                <MinusCircleOutlined onClick={() => removeStep(step.name)}/>
+                                                                            </Form.Item>
                                                                         </Space>
                                                                     ))}
                                                                     <Button type="dashed" onClick={() => addStep()} block icon={<PlusOutlined />}>

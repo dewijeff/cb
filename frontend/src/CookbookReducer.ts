@@ -9,7 +9,10 @@ export type CookbookState = {
     selectedListingRecipeId?: string;
     selectedRecipe?: Recipe;
     ingredients?: Ingredient[];
-    editRecipeOpen: boolean;
+    editRecipeOpen: {
+        isOpen: boolean;
+        recipe: Recipe;
+    };
     editIngredientOpen: boolean;
     allowEdit: boolean;
     isEditing: boolean;
@@ -21,7 +24,10 @@ export const cookbookInitialState: CookbookState = {
     selectedListingRecipeId: null,
     selectedRecipe: null,
     ingredients: null,
-    editRecipeOpen: false,
+    editRecipeOpen: {
+        isOpen: false,
+        recipe: null,
+    },
     editIngredientOpen: false,
     allowEdit: false,
     isEditing: false,

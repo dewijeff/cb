@@ -2,6 +2,7 @@
 using api.Areas.Categories.Models;
 using api.Areas.Categories.Services;
 using api.Shared;
+using api.Shared.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
@@ -27,7 +28,7 @@ public class CategoriesController : Controller
     [Route("categories")]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
     {
-        var categories = await _categoryRepository.GetCategories(cancellationToken);
+        var categories = (await _categoryRepository.GetCategories(cancellationToken)).EmptyIfNull().OrderBy(x => x.Order);
 
         return Json(categories, _jsonSettings);
     }

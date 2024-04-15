@@ -110,7 +110,7 @@ const CookbookHeader = ({cookbookName} : Props) => {
                         <Space direction='horizontal'>
                             {cookbookState.isEditing ? (
                                 <>
-                                    <Button onClick={() => cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload: true})}>Add Recipe</Button>
+                                    <Button onClick={() => cookbookDispatch({type: REDUCER_ACTION_TYPE.EDIT_RECIPE_OPEN, payload: {isOpen: true, recipeId: null}})}>Add Recipe</Button>
                                     <Button onClick={() => handleIngredientModal(true)}>Add Ingredient</Button>
                                     <Button onClick={() => {cookbookDispatch({type: REDUCER_ACTION_TYPE.SET_EDITING, payload: false})}}>Close Edit</Button>
                                 </>

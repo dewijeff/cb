@@ -1,6 +1,4 @@
-﻿using api.Areas.Categories.Models;
-using api.Areas.Recipes.Services;
-using api.Shared;
+﻿using api.Areas.Recipes.Services;
 
 namespace api.Areas.Categories.Services;
 
@@ -15,16 +13,6 @@ public sealed class CategoryDomainService : ICategoryDomainService
     {
         _categoryRepository = categoryRepository;
         _recipeRepository = recipeRepository;
-    }
-
-    public Task<ListingCategory> AddCategory(ListingCategory category, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<ListingCategory> EditCategory(ListingCategory category, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<bool> DeleteCategory(string id, CancellationToken cancellationToken)

@@ -1,0 +1,50 @@
+.category-row-container {
+    display: grid;
+    grid-template-columns: 75% 25%;
+}
+
+.category-name {
+    grid-column: 1;
+}
+
+.recipe-row-container {
+    display: grid;
+    grid-template-columns: 75% 25%;
+    padding-left: 30px;
+    padding-right: 75px;
+}
+
+.recipe-name {
+    grid-column: 1;
+}
+
+.category-actions {
+    grid-column: 2;
+    text-align: right;
+}
+
+.recipe-actions {
+    grid-column: 2;
+    text-align: left;
+}
+
+.actions-container {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+    height: 100%;
+}
+
+.remove-category-action {
+    grid-column: 1;
+    padding-left: 10px;
+}
+
+.move-up-action {
+    grid-column: 2;
+    padding-left: 10px;
+}
+
+.move-down-action {
+    grid-column: 3;
+    padding-left: 10px;
+}

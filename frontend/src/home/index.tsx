@@ -2,14 +2,14 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
-import { Layout, Menu, Spin } from 'antd'
-import { ListingCategory, CookbookName, JwtTokenName } from '../models';
+import {Button, Layout, Menu, Spin} from 'antd'
+import { ListingCategory, CookbookName } from '../models';
 import RecipeSection from './RecipeSection';
 import CookbookHeader from '../CookbookHeader';
 import { GetDbCategories, GetDbRecipe } from '../network';
 import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../CookbookReducer';
 import { useNavigate } from 'react-router-dom';
-import EditCategories from './EditCategories';
+import EditCategories from '../EditCategories';
 import EditIngredient from "../EditIngredient";
 import EditRecipe from "../EditRecipe";
 
@@ -19,13 +19,14 @@ const Home = () => {
     const [contentsLoading, setContentsLoading] = useState(true);
     const [errorLoadingContents, setErrorLoadingContents] = useState(false);
     const [recipeLoading, setRecipeLoading] = useState(false);
-    // const [categories, setCategories] = useState<ListingCategory[]>(null);
     const [selectedMenuItems, setSelectedMenuItems] = useState<string[]>(null);
     const [openCategories, setOpenCategories] = useState<string[]>(null);
+    const [editCategories, setEditCategories] = useState(false);
     const cookbookState: CookbookState = useContext(CookbookStateContext);
     const cookbookDispatch = useContext(CookbookDispatchContext);
     const navigate = useNavigate();
-    
+    const [categoriesCollapsed, setCategoriesCollapsed] = useState(false);
+
     const handleSetContentsLoading = (loading: boolean) => {
         setContentsLoading(loading)
     }
@@ -87,6 +88,10 @@ const Home = () => {
         setSelectedMenuItems(selectedKeys);
     };
 
+    const handleEditCategories = (openEdit: boolean) => {
+        setEditCategories(openEdit);
+    };
+
     const siderItems: MenuProps['items'] = cookbookState.listingCategories?.map(group => ({
         key: group.order,
         label: group.name,
@@ -99,12 +104,9 @@ const Home = () => {
         })
     }));
 
-    const siderWidth = () => {
-        if (cookbookState.isEditing)
-            return 500;
-
-        return 250;
-    }
+    const toggleCollapsed = (collapsed: boolean) => {
+        setCategoriesCollapsed(collapsed);
+    };
 
     return (
         <Layout>
@@ -116,22 +118,25 @@ const Home = () => {
                         </>
                     ) : (
                         <Layout>
-                            <Sider width={siderWidth()} style={{maxHeight: "900px", overflowX: "hidden", overflowY: "auto"}}>
-                                {cookbookState.isEditing ? (
-                                    <EditCategories listingCategories={cookbookState.listingCategories} />
-                                ) : (
+                            <Sider collapsible collapsed={categoriesCollapsed} onCollapse={toggleCollapsed} width={'250px'} style={{height: '100vh', maxHeight: "900px", overflowX: "hidden", overflowY: "hidden"}}>
+                                <>
+                                    {cookbookState.isEditing && (
+                                        <>
+                                            <Button style={{width: '100%'}} onClick={() => handleEditCategories(true)}>EditCategories</Button>
+                                            <EditCategories handleEditOpen={handleEditCategories} open={editCategories}/>
+                                        </>
+                                    )}
                                     <Menu
                                         mode="inline"
                                         defaultSelectedKeys={['1']}
-                                        style={{ height: '100%', borderRight: 0 }}
+                                        style={{ height: '100%', borderRight: 0 , overflowY: 'auto', overflowX: 'hidden'}}
                                         items={siderItems}
                                         selectedKeys={selectedMenuItems}
                                         openKeys={openCategories}
                                         onOpenChange={handleOpenChange}
                                         onSelect={handleMenuSelect}
                                     />
-                                )}
-
+                                </>
                             </Sider>
                             <Content>
                                 <div>
