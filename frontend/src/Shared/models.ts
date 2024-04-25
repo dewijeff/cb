@@ -1,17 +1,4 @@
-export const CookbookName = "jeff's";
-export const JwtTokenName = 'CookbookToken';
-
-export enum MeasurementUnit {
-    Cup = 1,
-    Tablespoon = 2,
-    Teaspoon = 3,
-    Ounce = 4,
-    Pound = 5,
-    Milliliter = 6,
-    Gram = 7,
-    Egg = 8,
-    Gallon = 9,
-}
+import {MeasurementUnit} from "./constants";
 
 export type Ingredient = {
     id: string;
@@ -19,13 +6,21 @@ export type Ingredient = {
     imagePath?: string;
     hideUnit: boolean;
     note?: string;
+    // proteinGramsPerServing: number;
+    // carbGramsPerServing: number;
+    // fatGramsPerServing: number;
+    calPerServing: number;
+    sodiumMgPerServing: number;
+    gramsPerServing: number;
+    volumePerServing: number;
+    volumePerServingUnit: MeasurementUnit;
 };
 
 export type RecipeIngredient = {
     ingredientId: string;
     ingredient: Ingredient;
     amount: number;
-    unit: number;
+    unit: MeasurementUnit;
     note: string;
 };
 
@@ -59,8 +54,13 @@ export type Recipe = {
     createdBy?: string;
     createdAt?: string;
     associatedRecipes?: string[];
+    servings: number;
 };
 
+export type Nutrition = {
+    calories: number;
+    sodium: number;
+};
 
 // TODO: @JXD - do I need anything additional about equipment (bowls, pans, pots...)
 // what about time and temperature for the oven?  for now, just putting all of that into the steps strings.

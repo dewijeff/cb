@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { Ingredient, JwtTokenName, ListingCategory, Recipe, UserLogin } from "./models";
+import { Ingredient, ListingCategory, Recipe, UserLogin } from "./models";
+import {JwtTokenName} from "./constants";
 
 const baseUrl = "https://localhost:7014"
 

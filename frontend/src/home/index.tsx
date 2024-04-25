@@ -3,15 +3,16 @@ import 'antd/dist/antd.css';
 import './index.css';
 import type { MenuProps } from 'antd';
 import {Button, Layout, Menu, Spin} from 'antd'
-import { ListingCategory, CookbookName } from '../models';
+import { ListingCategory } from '../Shared/models';
 import RecipeSection from './RecipeSection';
 import CookbookHeader from '../CookbookHeader';
-import { GetDbCategories, GetDbRecipe } from '../network';
-import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../CookbookReducer';
+import { GetDbCategories, GetDbRecipe } from '../Shared/network';
+import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from '../Shared/CookbookReducer';
 import { useNavigate } from 'react-router-dom';
 import EditCategories from '../EditCategories';
 import EditIngredient from "../EditIngredient";
 import EditRecipe from "../EditRecipe";
+import {CookbookName} from "../Shared/constants";
 
 const { Content, Sider } = Layout;
 

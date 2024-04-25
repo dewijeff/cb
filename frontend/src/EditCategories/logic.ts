@@ -1,5 +1,5 @@
-import {ListingCategory} from "../models";
-import {AddDbCategory, EditDbCategory} from "../network";
+import {ListingCategory} from "../Shared/models";
+import {AddDbCategory, EditDbCategory} from "../Shared/network";
 
 export const UpdateCategories = async (newCategories: ListingCategory[]) => {
     // adds and updates - deletes handled individually and live.

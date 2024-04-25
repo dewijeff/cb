@@ -1,5 +1,5 @@
 import React from 'react';
-import { RecipeStepGroup } from '../../../models';
+import { RecipeStepGroup } from '../../../Shared/models';
 import { Steps } from 'antd';
 
 const InstructionGroupSection = (stepGroup: RecipeStepGroup) => {

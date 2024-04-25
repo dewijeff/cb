@@ -28,6 +28,9 @@ public class Recipe
     [BsonElement("images")]
     public IEnumerable<string>? Images { get; set; }
 
+    [BsonElement("servings")]
+    public decimal Servings { get; set; }
+
     [BsonElement("createdBy")]
     public string? CreatedBy { get; set; }
 

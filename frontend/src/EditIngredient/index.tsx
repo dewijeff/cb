@@ -1,15 +1,29 @@
-import { Form, Space, Input, Checkbox, Modal, notification, Spin, message } from "antd";
-import React, { useContext, useState } from "react";
-import { Ingredient } from "../models";
-import { AddDbIngredient, GetDbIngredients } from "../network";
-import {CookbookDispatchContext, REDUCER_ACTION_TYPE, CookbookStateContext, CookbookState} from "../CookbookReducer";
+import {Form, Space, Input, Checkbox, Modal, notification, Spin, message, Select} from "antd";
+import React, {useContext, useEffect, useState} from "react";
+import { Ingredient } from "../Shared/models";
+import { AddDbIngredient, GetDbIngredients } from "../Shared/network";
+import {CookbookDispatchContext, REDUCER_ACTION_TYPE, CookbookStateContext, CookbookState} from "../Shared/CookbookReducer";
+import {MeasurementUnit} from "../Shared/constants";
 
 const EditIngredient = () => {
     const [working, setWorking] = useState(false);
+    const [measurementUnits, setMeasurementUnits] = useState([{}]);
+
     const cookbookDispatch = useContext(CookbookDispatchContext)
     const cookbookState : CookbookState = useContext(CookbookStateContext);
 
     const [form] = Form.useForm<Ingredient>();
+
+    useEffect(() => {
+        const measurements = Object.entries(MeasurementUnit).filter(([_, value]) => !isNaN(Number(value))).map(([label, value]) => (
+            {
+                value: value,
+                label: label
+            }
+        ));
+
+        setMeasurementUnits(measurements);
+    }, []);
 
     const onFinish = async () => {
         setWorking(true);
@@ -65,6 +79,21 @@ const EditIngredient = () => {
                                 <Checkbox />
                             </Form.Item>
                         </Space>
+                        <Form.Item label='Calories Per Serving' name='calPerServing'>
+                            <Input/>
+                        </Form.Item>
+                        <Form.Item label='Sodium mg Per Serving' name='sodiumMgPerServing'>
+                            <Input/>
+                        </Form.Item>
+                        <Form.Item label='Grams Per Serving' name='gramsPerServing'>
+                            <Input/>
+                        </Form.Item>
+                        <Form.Item label='Volume Per Serving' name='volumePerServing'>
+                            <Input/>
+                        </Form.Item>
+                        <Form.Item label='Volume Per Serving Units' name='volumePerServingUnit'>
+                            <Select dropdownMatchSelectWidth={false} style={{width: "15rem"}} placeholder='Select a unit' options={measurementUnits}/>
+                        </Form.Item>
                     </Space>
                 </Form>
             </Spin>

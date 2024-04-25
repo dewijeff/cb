@@ -21,6 +21,19 @@ public class Ingredient
 
     [BsonElement("note")]
     public string? Note { get; set; }
-    // calories per 100g
-    // grams per cup (average) - to allow conversion between units
+
+    [BsonElement("calPerServing")]
+    public decimal CalPerServing { get; set; }
+
+    [BsonElement("sodiumMgPerServing")]
+    public decimal SodiumMgPerServing { get; set; }
+
+    [BsonElement("gramsPerServing")]
+    public decimal GramsPerServing { get; set; }
+
+    [BsonElement("volumePerServing")]
+    public decimal VolumePerServing { get; set; }
+
+    [BsonElement("volumePerServingUnit")]
+    public int VolumePerServingUnit { get; set; }
 }

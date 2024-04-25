@@ -1,7 +1,7 @@
 import React from "react";
 import 'antd/dist/antd.css';
-import { RecipeIngredient } from "../../../../models";
-import { GetIngredientNameString, GetUnitsString } from "../../../../helpers";
+import { RecipeIngredient } from "../../../../Shared/models";
+import { GetIngredientNameString, GetUnitsString } from "../../../../Shared/helpers";
 
 const RecipeIngredientSection = ({ingredient, amount, unit} :RecipeIngredient) => (
     <div className="ingredient-item" key={ingredient.name}>

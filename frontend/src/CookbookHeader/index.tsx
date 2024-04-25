@@ -1,13 +1,11 @@
 import { Header } from "antd/lib/layout/layout";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import './index.css';
-import { Button, Dropdown, MenuProps, Space } from "antd";
-import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
-import { JwtTokenName } from "../models";
+import { Button, Dropdown, Space } from "antd";
+import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../Shared/CookbookReducer";
 import { useNavigate } from "react-router-dom";
 import { MenuOutlined } from "@ant-design/icons";
-import EditRecipe from "../EditRecipe";
-import EditIngredient from "../EditIngredient";
+import {JwtTokenName} from "../Shared/constants";
 
 interface DropdownItem {
     key: string;

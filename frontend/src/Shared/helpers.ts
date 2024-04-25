@@ -1,4 +1,4 @@
-import { MeasurementUnit } from "./models";
+import {MeasurementUnit} from "./constants";
 
 export function GetIngredientNameString(count: number, name: string, hideUnit: boolean)
 {

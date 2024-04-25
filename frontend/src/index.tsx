@@ -2,7 +2,7 @@ import React, { useReducer } from "react";
 import { createRoot } from 'react-dom/client';
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./Home";
-import { CookbookDispatchContext, CookbookStateContext, cookbookInitialState, CookbookReducer, } from "./CookbookReducer";
+import { CookbookDispatchContext, CookbookStateContext, cookbookInitialState, CookbookReducer, } from "./Shared/CookbookReducer";
 import About from "./About";
 import Login from "./Login";
 import Register from "./Register";

@@ -1,14 +1,15 @@
 import React, { useContext, useState } from "react";
-import { Recipe } from "../../models";
+import { Recipe } from "../../Shared/models";
 import IngredientGroupSection from "./IngredientGroupSection";
 import InstructionGroupSection from "./InstructionGroupSection";
 import 'antd/dist/antd.css';
 import './index.css';
 import { Button, Popconfirm, Space, Spin } from "antd";
 import EditRecipe from "../../EditRecipe";
-import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../../CookbookReducer";
-import { DeleteDbRecipe, GetDbCategories } from "../../network";
+import { CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE } from "../../Shared/CookbookReducer";
+import { DeleteDbRecipe, GetDbCategories } from "../../Shared/network";
 import EditIngredient from "../../EditIngredient";
+import NutritionSection from "./NutritionSection";
 
 interface Props {
     recipe: Recipe;
@@ -66,6 +67,7 @@ const RecipeSection = ({recipe, loading, setLoading}: Props) => {
                             </div>
                         )}
                     </div>
+                    <NutritionSection recipe={recipe}/>
                     <div className="ingredients-container">
                         {recipe.ingredientGroups?.map(x => IngredientGroupSection(x))}
                     </div>

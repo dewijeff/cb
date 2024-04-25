@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import { ListingCategory } from "../models";
+import { ListingCategory } from "../Shared/models";
 import {
     Button,
     Form,
@@ -10,15 +10,13 @@ import {
     message,
     notification,
     Drawer,
-    Layout,
     Row, Col
 } from "antd";
 import { DownCircleOutlined, MinusCircleOutlined, UpCircleOutlined } from "@ant-design/icons";
-import {CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE} from "../CookbookReducer";
+import {CookbookDispatchContext, CookbookState, CookbookStateContext, REDUCER_ACTION_TYPE} from "../Shared/CookbookReducer";
 import './index.css';
 import {UpdateCategories} from "./logic";
-import {DeleteDbCategory, GetDbCategories} from "../network";
-import {Content, Footer} from "antd/es/layout/layout";
+import {DeleteDbCategory, GetDbCategories} from "../Shared/network";
 
 interface CategoriesContainer {
     categories: ListingCategory[];
@@ -107,19 +105,30 @@ const EditCategories = ({handleEditOpen, open} : Props) => {
 
         const afterCategories = [...beforeCategories, {}];
         form.setFieldValue('categories', afterCategories);
+
+        // TODO: @JLD - this does not refresh the existing items, and
     }
 
+    // TODO: @JLD - this doesn't work well on the left button.  works fine on 1080p, but the right side of the button ends up behind the next column.  maybe use a real grid layout here instead of an antd column layout...
     const Footer = () => (
         <Row>
-            <Col span={1}>
+            <Col span={7}>
                 <Button onClick={handleAddCategory}>Add Category</Button>
             </Col>
-            <Col span={20}></Col>
+            <Col span={14}></Col>
             <Col span={1} style={{textAlign: 'right'}}>
                 <Button htmlType='submit' type="primary" onClick={handleSubmit}>Save</Button>
             </Col>
         </Row>
     );
+
+    const hideMoveUp = () => {
+
+    }
+
+    const hideMoveDown = () => {
+
+    }
 
     return (
         <Drawer
@@ -143,14 +152,11 @@ const EditCategories = ({handleEditOpen, open} : Props) => {
                         {(categoryList, {add: addCategory, remove: removeCategory, move: moveCategory}) => (
                             <Space direction='vertical' style={{width: '100%'}}>
                                 {categoryList.map((listingCategory, categoryIndex) => (
-                                    <Space direction='vertical' style={{width: '100%'}}>
+                                    <Space direction='vertical' style={{width: '100%'}} key={listingCategory.key}>
                                         <div className='category-row-container'>
                                             <Form.Item name={[listingCategory.name, 'name']} label='Category Name:' rules={[{required: true, message:"required"}]} className='category-name'>
                                                 <Input />
                                             </Form.Item>
-                                            {/*<Form.Item>*/}
-                                            {/*    <PlusCircleOutlined onClick={() => addCategory()}/>*/}
-                                            {/*</Form.Item>*/}
                                             <Form.Item className='category-actions'>
                                                 <div className='actions-container'>
                                                     <Popconfirm
@@ -170,7 +176,7 @@ const EditCategories = ({handleEditOpen, open} : Props) => {
                                             {(listingRecipes, {move: moveRecipe}) => (
                                                 <Space direction='vertical' style={{width: '100%'}}>
                                                     {listingRecipes.map((listingRecipe, recipeIndex) => (
-                                                        <div className='recipe-row-container'>
+                                                        <div className='recipe-row-container' key={listingRecipe.key}>
                                                             <span className='recipe-name' onClick={() => handleSelectRecipe(listingCategory, listingRecipe)}>{form.getFieldValue(['categories', listingCategory.name, 'recipes', listingRecipe.name, 'name'])}</span>
                                                             <div className='recipe-actions'>
                                                                 <div className='actions-container'>

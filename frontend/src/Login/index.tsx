@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Input, Layout, Space, Spin } from "antd";
-import { LoginUser, VerifyAuth } from "../network";
+import { LoginUser, VerifyAuth } from "../Shared/network";
 import { useNavigate } from "react-router-dom";
-import { JwtTokenName, UserLogin } from "../models";
 import { jwtDecode } from "jwt-decode";
-import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../CookbookReducer";
+import { CookbookDispatchContext, REDUCER_ACTION_TYPE } from "../Shared/CookbookReducer";
 import CookbookHeader from "../CookbookHeader";
+import {UserLogin} from "../Shared/models";
+import {JwtTokenName} from "../Shared/constants";
 
 const { Content, Sider } = Layout;
 
